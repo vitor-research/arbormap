@@ -7,6 +7,7 @@ Código preservado como no notebook; caminhos do Colab/Drive devem ser ajustados
 """
 
 from collections import defaultdict
+import os
 from pathlib import Path
 import numpy as np
 
@@ -85,4 +86,4 @@ def analyze_cloudy_cities(data_dir, temp_threshold=15.0, min_cloud_pct=30.0):
 # ============================================================
 if __name__ == "__main__":
     # Certifique-se de que a variável DATA_DIR está definida
-    ranking_cidades = analyze_cloudy_cities("/content/drive/MyDrive/heat_dataset_v3", temp_threshold=15.0, min_cloud_pct=30.0)
+    ranking_cidades = analyze_cloudy_cities(os.environ.get("ARBORMAP_DATA_DIR", "./data"), temp_threshold=15.0, min_cloud_pct=30.0)

@@ -6,6 +6,7 @@ Verifica coerência entre predições e índices físicos no fold de validação
 Código preservado como no notebook; caminhos do Colab/Drive devem ser ajustados nas CONFIGURAÇÕES.
 """
 
+import os
 import torch
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
@@ -106,5 +107,5 @@ if __name__ == "__main__":
     analisar_alucinacao(
         model_path="best_model_fold_0.pt",
         fold_idx=0,
-        data_root="/content/drive/MyDrive/heat_dataset_v3"
+        data_root=os.environ.get("ARBORMAP_DATA_DIR", "./data")
     )

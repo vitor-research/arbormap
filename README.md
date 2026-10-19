@@ -30,7 +30,12 @@ figures/       figuras do artigo, em resolução original
 legacy/        v1 (ConvLSTM, abril/2026) e versão intermediária com ASPP
 ```
 
-Os arquivos em `src/` preservam o código tal como executado no Google Colab, com um cabeçalho indicando a célula de origem. As constantes de caminho (`DATA_DIR`, `FILES_DIR`) apontam para o Google Drive do autor e devem ser ajustadas para o ambiente local.
+Os arquivos em `src/` preservam o código tal como executado no Google Colab, com um cabeçalho indicando a célula de origem. As constantes de caminho (`DATA_DIR`, `FILES_DIR`, `data_root`) são lidas da variável de ambiente `ARBORMAP_DATA_DIR`; quando ela não está definida, usa-se `./data`. No Google Colab, defina a variável antes de executar qualquer script, apontando para a pasta do dataset no Drive:
+
+```python
+import os
+os.environ["ARBORMAP_DATA_DIR"] = "/content/drive/MyDrive/heat_dataset_v3"
+```
 
 ## Reprodução
 

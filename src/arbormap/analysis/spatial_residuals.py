@@ -6,6 +6,7 @@ Mapas de erro absoluto (base da Figura 4).
 Código preservado como no notebook; caminhos do Colab/Drive devem ser ajustados nas CONFIGURAÇÕES.
 """
 
+import os
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
@@ -90,6 +91,6 @@ def analisar_residuos_espaciais(model_path, data_root, city_name):
 if __name__ == "__main__":
     analisar_residuos_espaciais(
         model_path="best_model_fold_0.pt",
-        data_root="/content/drive/MyDrive/heat_dataset_v3",
+        data_root=os.environ.get("ARBORMAP_DATA_DIR", "./data"),
         city_name="Jose_de_Freitas"
     )

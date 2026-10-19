@@ -6,6 +6,7 @@ Análise integrada por cidade.
 Código preservado como no notebook; caminhos do Colab/Drive devem ser ajustados nas CONFIGURAÇÕES.
 """
 
+import os
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
@@ -146,6 +147,6 @@ def analisar_residuos_e_plantio_hibrido(model_path, data_root, city_name):
 if __name__ == "__main__":
     analisar_residuos_e_plantio_hibrido(
         model_path="best_hybrid_fold_0.pt",
-        data_root="/content/drive/MyDrive/heat_dataset_v3",
+        data_root=os.environ.get("ARBORMAP_DATA_DIR", "./data"),
         city_name="Teresina" # Teste com outra cidade se quiser
     )

@@ -21,9 +21,9 @@ SEED = 42
 random.seed(SEED)
 np.random.seed(SEED)
 
-DATA_DIR = Path("/content/drive/MyDrive/IA/Pibic/Vulnerability/heat_dataset_v3")
+DATA_DIR = Path(os.environ.get("ARBORMAP_DATA_DIR", "./data"))
 # Pasta de destino para onde as imagens poluídas serão movidas
-QUARANTINE_DIR = Path("/content/drive/MyDrive/IA/Pibic/Vulnerability/heat_dataset_v3_poluidas")
+QUARANTINE_DIR = DATA_DIR.parent / (DATA_DIR.name + "_poluidas")
 
 CH_LST = 4
 
