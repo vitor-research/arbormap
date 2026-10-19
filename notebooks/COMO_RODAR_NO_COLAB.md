@@ -1,6 +1,6 @@
 # Como rodar o ARBORMAP no Google Colab (passo a passo)
 
-Tempo total: cerca de 10 a 11 horas na GPU T4 (medido: cerca de 250 s por época, 30 épocas por fold, 5 folds). Não precisa ficar olhando; deixe a aba aberta e o computador sem entrar em suspensão. Se a sessão cair, o treino continua de onde parou (passo 7).
+Tempo total (medido, 30 épocas por fold, 5 folds): cerca de 10 a 11 horas na GPU T4 (cerca de 250 s por época) ou cerca de 75 minutos na A100 (cerca de 29 s por época). Com Colab Pro, a A100 consome cerca de 5,3 unidades de computação por hora (o treino inteiro, cerca de 7 unidades); escolha-a no passo 3 se estiver disponível. Não precisa ficar olhando; deixe a aba aberta e o computador sem entrar em suspensão. Se a sessão cair, o treino continua de onde parou (passo 7).
 
 ## Antes de começar
 
