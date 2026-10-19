@@ -1,0 +1,230 @@
+☁️ Filtrando 1036 imagens...
+ -> Imagens válidas mantidas: 847
+
+1. Extraindo Estatísticas Globais...
+
+======================================================================
+🚀 TESTE DE SANIDADE: OVERFIT EM 1 BATCH
+======================================================================
+Epoch 000 | Loss: 4.4626 | MAE (°C): 6.7180 | HS MAE (°C): 5.5741 | IoU: 0.0113
+Epoch 010 | Loss: 2.3093 | MAE (°C): 6.4970 | HS MAE (°C): 2.4880 | IoU: 0.1428
+Epoch 020 | Loss: 1.9441 | MAE (°C): 5.4539 | HS MAE (°C): 1.9288 | IoU: 0.1711
+Epoch 030 | Loss: 1.6714 | MAE (°C): 4.9611 | HS MAE (°C): 1.9276 | IoU: 0.1924
+Epoch 040 | Loss: 1.6286 | MAE (°C): 4.9437 | HS MAE (°C): 1.4453 | IoU: 0.2076
+Epoch 050 | Loss: 1.5005 | MAE (°C): 5.1909 | HS MAE (°C): 1.0359 | IoU: 0.2169
+Epoch 060 | Loss: 1.4143 | MAE (°C): 4.9224 | HS MAE (°C): 1.0343 | IoU: 0.2292
+Epoch 070 | Loss: 1.3512 | MAE (°C): 4.7422 | HS MAE (°C): 1.0041 | IoU: 0.2441
+Epoch 080 | Loss: 1.3181 | MAE (°C): 4.8595 | HS MAE (°C): 0.9309 | IoU: 0.2605
+Epoch 090 | Loss: 1.2928 | MAE (°C): 4.5336 | HS MAE (°C): 1.0050 | IoU: 0.2722
+Epoch 099 | Loss: 1.2685 | MAE (°C): 4.4369 | HS MAE (°C): 0.9378 | IoU: 0.3005
+======================================================================
+
+--- Iniciando FOLD 1 ---
+Epoch 01 | T.Loss: 2.7382 | V.Loss: 2.5737 | MAE (°C): 4.4626 | HS MAE: 2.8390 | IoU: 0.1481
+Epoch 02 | T.Loss: 2.4347 | V.Loss: 2.5999 | MAE (°C): 4.3831 | HS MAE: 2.9814 | IoU: 0.1433
+Epoch 03 | T.Loss: 2.3877 | V.Loss: 2.5211 | MAE (°C): 4.3032 | HS MAE: 2.8235 | IoU: 0.1545
+Epoch 04 | T.Loss: 2.3329 | V.Loss: 2.6671 | MAE (°C): 4.4263 | HS MAE: 3.1195 | IoU: 0.1488
+Epoch 05 | T.Loss: 2.2746 | V.Loss: 2.5705 | MAE (°C): 4.0142 | HS MAE: 3.1147 | IoU: 0.1414
+Epoch 06 | T.Loss: 2.3372 | V.Loss: 2.7056 | MAE (°C): 4.6663 | HS MAE: 3.0852 | IoU: 0.1432
+Epoch 07 | T.Loss: 2.2695 | V.Loss: 2.5498 | MAE (°C): 4.0092 | HS MAE: 3.0829 | IoU: 0.1438
+Epoch 08 | T.Loss: 2.2731 | V.Loss: 2.7119 | MAE (°C): 4.7044 | HS MAE: 3.0692 | IoU: 0.1319
+Epoch 09 | T.Loss: 2.2408 | V.Loss: 2.8028 | MAE (°C): 4.8421 | HS MAE: 3.2325 | IoU: 0.1359
+Epoch 10 | T.Loss: 2.1807 | V.Loss: 2.7847 | MAE (°C): 4.5979 | HS MAE: 3.3300 | IoU: 0.1402
+Epoch 11 | T.Loss: 2.1776 | V.Loss: 2.7461 | MAE (°C): 4.6935 | HS MAE: 3.1812 | IoU: 0.1441
+Epoch 12 | T.Loss: 2.1718 | V.Loss: 2.6380 | MAE (°C): 4.5338 | HS MAE: 2.9961 | IoU: 0.1410
+Epoch 13 | T.Loss: 2.2093 | V.Loss: 2.6216 | MAE (°C): 4.3672 | HS MAE: 3.0543 | IoU: 0.1468
+Epoch 14 | T.Loss: 2.1370 | V.Loss: 2.6670 | MAE (°C): 4.5129 | HS MAE: 3.0804 | IoU: 0.1438
+Epoch 15 | T.Loss: 2.1889 | V.Loss: 2.7053 | MAE (°C): 4.6785 | HS MAE: 3.0851 | IoU: 0.1465
+Epoch 16 | T.Loss: 2.1641 | V.Loss: 2.8252 | MAE (°C): 4.9519 | HS MAE: 3.2180 | IoU: 0.1544
+Epoch 17 | T.Loss: 2.1605 | V.Loss: 2.6571 | MAE (°C): 4.5092 | HS MAE: 3.0572 | IoU: 0.1610
+Epoch 18 | T.Loss: 2.1280 | V.Loss: 2.9159 | MAE (°C): 5.0966 | HS MAE: 3.3830 | IoU: 0.1584
+Epoch 19 | T.Loss: 2.0899 | V.Loss: 2.7735 | MAE (°C): 4.6759 | HS MAE: 3.2694 | IoU: 0.1571
+Epoch 20 | T.Loss: 2.0720 | V.Loss: 2.8231 | MAE (°C): 4.8228 | HS MAE: 3.3091 | IoU: 0.1519
+Epoch 21 | T.Loss: 2.1370 | V.Loss: 2.8188 | MAE (°C): 4.7359 | HS MAE: 3.3537 | IoU: 0.1549
+Epoch 22 | T.Loss: 2.0837 | V.Loss: 2.7487 | MAE (°C): 4.4907 | HS MAE: 3.3139 | IoU: 0.1450
+Epoch 23 | T.Loss: 2.1079 | V.Loss: 2.8207 | MAE (°C): 4.7935 | HS MAE: 3.3250 | IoU: 0.1442
+Epoch 24 | T.Loss: 2.1135 | V.Loss: 2.7923 | MAE (°C): 4.7622 | HS MAE: 3.2566 | IoU: 0.1467
+Epoch 25 | T.Loss: 2.0753 | V.Loss: 2.7564 | MAE (°C): 4.6795 | HS MAE: 3.2256 | IoU: 0.1533
+Epoch 26 | T.Loss: 2.0887 | V.Loss: 2.8198 | MAE (°C): 4.8507 | HS MAE: 3.2835 | IoU: 0.1491
+Epoch 27 | T.Loss: 2.0714 | V.Loss: 2.7931 | MAE (°C): 4.8205 | HS MAE: 3.2398 | IoU: 0.1493
+Epoch 28 | T.Loss: 2.0489 | V.Loss: 2.7131 | MAE (°C): 4.4676 | HS MAE: 3.2436 | IoU: 0.1495
+Epoch 29 | T.Loss: 2.0873 | V.Loss: 2.6753 | MAE (°C): 4.5078 | HS MAE: 3.1198 | IoU: 0.1524
+Epoch 30 | T.Loss: 2.0787 | V.Loss: 2.7362 | MAE (°C): 4.7159 | HS MAE: 3.1488 | IoU: 0.1476
+Epoch 31 | T.Loss: 2.0345 | V.Loss: 2.8234 | MAE (°C): 4.9450 | HS MAE: 3.2376 | IoU: 0.1485
+Epoch 32 | T.Loss: 2.0436 | V.Loss: 2.7810 | MAE (°C): 4.8935 | HS MAE: 3.1596 | IoU: 0.1503
+Epoch 33 | T.Loss: 2.0027 | V.Loss: 2.7365 | MAE (°C): 4.6895 | HS MAE: 3.1724 | IoU: 0.1508
+Epoch 34 | T.Loss: 2.0655 | V.Loss: 2.7967 | MAE (°C): 4.8972 | HS MAE: 3.2043 | IoU: 0.1465
+Epoch 35 | T.Loss: 2.0111 | V.Loss: 2.7327 | MAE (°C): 4.7022 | HS MAE: 3.1552 | IoU: 0.1485
+Epoch 36 | T.Loss: 2.0013 | V.Loss: 2.7065 | MAE (°C): 4.6414 | HS MAE: 3.1259 | IoU: 0.1428
+Epoch 37 | T.Loss: 2.0044 | V.Loss: 2.7506 | MAE (°C): 4.7433 | HS MAE: 3.1774 | IoU: 0.1395
+Epoch 38 | T.Loss: 1.9898 | V.Loss: 2.6981 | MAE (°C): 4.5826 | HS MAE: 3.1357 | IoU: 0.1455
+Epoch 39 | T.Loss: 2.0187 | V.Loss: 2.6524 | MAE (°C): 4.5697 | HS MAE: 3.0323 | IoU: 0.1402
+Epoch 40 | T.Loss: 2.0118 | V.Loss: 2.7422 | MAE (°C): 4.7073 | HS MAE: 3.1776 | IoU: 0.1429
+
+--- Iniciando FOLD 2 ---
+Epoch 01 | T.Loss: 2.7567 | V.Loss: 2.4269 | MAE (°C): 4.4605 | HS MAE: 2.2116 | IoU: 0.1732
+Epoch 02 | T.Loss: 2.5305 | V.Loss: 2.2527 | MAE (°C): 3.7502 | HS MAE: 2.2409 | IoU: 0.1897
+Epoch 03 | T.Loss: 2.5338 | V.Loss: 2.1459 | MAE (°C): 3.1689 | HS MAE: 2.4696 | IoU: 0.1832
+Epoch 04 | T.Loss: 2.4525 | V.Loss: 2.1437 | MAE (°C): 3.3512 | HS MAE: 2.3629 | IoU: 0.1942
+Epoch 05 | T.Loss: 2.4033 | V.Loss: 2.1792 | MAE (°C): 3.3102 | HS MAE: 2.4922 | IoU: 0.1801
+Epoch 06 | T.Loss: 2.4162 | V.Loss: 2.2562 | MAE (°C): 3.7784 | HS MAE: 2.3543 | IoU: 0.2100
+Epoch 07 | T.Loss: 2.3804 | V.Loss: 2.1299 | MAE (°C): 3.2940 | HS MAE: 2.3537 | IoU: 0.1840
+Epoch 08 | T.Loss: 2.3433 | V.Loss: 2.4272 | MAE (°C): 4.1297 | HS MAE: 2.5907 | IoU: 0.2049
+Epoch 09 | T.Loss: 2.3704 | V.Loss: 2.2345 | MAE (°C): 2.9989 | HS MAE: 2.7988 | IoU: 0.1917
+Epoch 10 | T.Loss: 2.3607 | V.Loss: 2.2204 | MAE (°C): 3.5128 | HS MAE: 2.4482 | IoU: 0.1729
+Epoch 11 | T.Loss: 2.3505 | V.Loss: 2.1867 | MAE (°C): 3.1692 | HS MAE: 2.5506 | IoU: 0.1869
+Epoch 12 | T.Loss: 2.3137 | V.Loss: 2.1460 | MAE (°C): 3.2451 | HS MAE: 2.4035 | IoU: 0.1929
+Epoch 13 | T.Loss: 2.2667 | V.Loss: 2.1514 | MAE (°C): 3.2636 | HS MAE: 2.4432 | IoU: 0.1997
+Epoch 14 | T.Loss: 2.3099 | V.Loss: 2.1536 | MAE (°C): 3.5630 | HS MAE: 2.2602 | IoU: 0.2065
+Epoch 15 | T.Loss: 2.2984 | V.Loss: 2.1710 | MAE (°C): 3.1899 | HS MAE: 2.5178 | IoU: 0.2018
+Epoch 16 | T.Loss: 2.2628 | V.Loss: 2.1750 | MAE (°C): 3.1682 | HS MAE: 2.5538 | IoU: 0.2000
+Epoch 17 | T.Loss: 2.2330 | V.Loss: 2.1630 | MAE (°C): 3.1750 | HS MAE: 2.5316 | IoU: 0.1895
+Epoch 18 | T.Loss: 2.2524 | V.Loss: 2.1962 | MAE (°C): 3.3440 | HS MAE: 2.4865 | IoU: 0.1985
+Epoch 19 | T.Loss: 2.1834 | V.Loss: 2.1922 | MAE (°C): 3.1915 | HS MAE: 2.5698 | IoU: 0.2037
+Epoch 20 | T.Loss: 2.2033 | V.Loss: 2.1939 | MAE (°C): 3.0590 | HS MAE: 2.6585 | IoU: 0.2028
+Epoch 21 | T.Loss: 2.2309 | V.Loss: 2.1941 | MAE (°C): 3.2698 | HS MAE: 2.5518 | IoU: 0.2046
+Epoch 22 | T.Loss: 2.1770 | V.Loss: 2.2212 | MAE (°C): 3.1558 | HS MAE: 2.6682 | IoU: 0.2003
+Epoch 23 | T.Loss: 2.1719 | V.Loss: 2.2070 | MAE (°C): 3.1540 | HS MAE: 2.6410 | IoU: 0.2078
+Epoch 24 | T.Loss: 2.1753 | V.Loss: 2.1770 | MAE (°C): 3.2868 | HS MAE: 2.4906 | IoU: 0.2065
+Epoch 25 | T.Loss: 2.1507 | V.Loss: 2.2326 | MAE (°C): 3.3089 | HS MAE: 2.6140 | IoU: 0.2015
+Epoch 26 | T.Loss: 2.1819 | V.Loss: 2.2301 | MAE (°C): 3.5369 | HS MAE: 2.4488 | IoU: 0.1859
+Epoch 27 | T.Loss: 2.2034 | V.Loss: 2.2285 | MAE (°C): 3.1693 | HS MAE: 2.6809 | IoU: 0.2084
+Epoch 28 | T.Loss: 2.1694 | V.Loss: 2.2199 | MAE (°C): 3.3450 | HS MAE: 2.5686 | IoU: 0.1984
+Epoch 29 | T.Loss: 2.1467 | V.Loss: 2.2104 | MAE (°C): 3.2576 | HS MAE: 2.5888 | IoU: 0.2011
+Epoch 30 | T.Loss: 2.1403 | V.Loss: 2.1780 | MAE (°C): 3.2753 | HS MAE: 2.4905 | IoU: 0.2055
+Epoch 31 | T.Loss: 2.0987 | V.Loss: 2.2125 | MAE (°C): 3.2569 | HS MAE: 2.5864 | IoU: 0.2097
+Epoch 32 | T.Loss: 2.0926 | V.Loss: 2.2064 | MAE (°C): 3.2479 | HS MAE: 2.5895 | IoU: 0.2099
+Epoch 33 | T.Loss: 2.0969 | V.Loss: 2.1871 | MAE (°C): 3.2537 | HS MAE: 2.5409 | IoU: 0.2126
+Epoch 34 | T.Loss: 2.1130 | V.Loss: 2.1986 | MAE (°C): 3.1446 | HS MAE: 2.6253 | IoU: 0.2025
+Epoch 35 | T.Loss: 2.0929 | V.Loss: 2.2014 | MAE (°C): 3.3046 | HS MAE: 2.5273 | IoU: 0.2015
+Epoch 36 | T.Loss: 2.0869 | V.Loss: 2.1886 | MAE (°C): 3.3105 | HS MAE: 2.4968 | IoU: 0.2074
+Epoch 37 | T.Loss: 2.1100 | V.Loss: 2.2121 | MAE (°C): 3.2681 | HS MAE: 2.5941 | IoU: 0.2094
+Epoch 38 | T.Loss: 2.0534 | V.Loss: 2.2074 | MAE (°C): 3.3348 | HS MAE: 2.5369 | IoU: 0.2072
+Epoch 39 | T.Loss: 2.0536 | V.Loss: 2.1784 | MAE (°C): 3.2331 | HS MAE: 2.5267 | IoU: 0.2045
+Epoch 40 | T.Loss: 2.0863 | V.Loss: 2.2112 | MAE (°C): 3.2936 | HS MAE: 2.5701 | IoU: 0.2087
+
+--- Iniciando FOLD 3 ---
+Epoch 01 | T.Loss: 2.8037 | V.Loss: 1.9652 | MAE (°C): 3.1263 | HS MAE: 2.0382 | IoU: 0.1481
+Epoch 02 | T.Loss: 2.5230 | V.Loss: 2.0526 | MAE (°C): 3.4551 | HS MAE: 2.0358 | IoU: 0.1575
+Epoch 03 | T.Loss: 2.4773 | V.Loss: 2.1914 | MAE (°C): 3.8292 | HS MAE: 2.1773 | IoU: 0.1696
+Epoch 04 | T.Loss: 2.4869 | V.Loss: 2.9353 | MAE (°C): 5.2616 | HS MAE: 3.1991 | IoU: 0.1718
+Epoch 05 | T.Loss: 2.4678 | V.Loss: 2.0221 | MAE (°C): 3.5002 | HS MAE: 1.9272 | IoU: 0.1678
+Epoch 06 | T.Loss: 2.4389 | V.Loss: 2.0224 | MAE (°C): 3.4197 | HS MAE: 2.0180 | IoU: 0.1764
+Epoch 07 | T.Loss: 2.3646 | V.Loss: 2.1734 | MAE (°C): 3.9110 | HS MAE: 2.0971 | IoU: 0.1795
+Epoch 08 | T.Loss: 2.3248 | V.Loss: 2.3521 | MAE (°C): 4.2633 | HS MAE: 2.3616 | IoU: 0.1889
+Epoch 09 | T.Loss: 2.2932 | V.Loss: 2.2898 | MAE (°C): 3.9390 | HS MAE: 2.3749 | IoU: 0.1748
+Epoch 10 | T.Loss: 2.3204 | V.Loss: 2.4196 | MAE (°C): 4.1803 | HS MAE: 2.5591 | IoU: 0.1886
+Epoch 11 | T.Loss: 2.3078 | V.Loss: 2.5393 | MAE (°C): 4.2976 | HS MAE: 2.7716 | IoU: 0.1794
+Epoch 12 | T.Loss: 2.2556 | V.Loss: 2.1772 | MAE (°C): 3.7375 | HS MAE: 2.1879 | IoU: 0.1813
+Epoch 13 | T.Loss: 2.3049 | V.Loss: 2.2405 | MAE (°C): 3.9805 | HS MAE: 2.1667 | IoU: 0.1845
+Epoch 14 | T.Loss: 2.2980 | V.Loss: 2.0590 | MAE (°C): 3.2270 | HS MAE: 2.2459 | IoU: 0.1839
+Epoch 15 | T.Loss: 2.2468 | V.Loss: 2.2963 | MAE (°C): 3.8600 | HS MAE: 2.4343 | IoU: 0.1807
+Epoch 16 | T.Loss: 2.2824 | V.Loss: 2.4394 | MAE (°C): 4.1301 | HS MAE: 2.5976 | IoU: 0.1916
+Epoch 17 | T.Loss: 2.2315 | V.Loss: 2.6662 | MAE (°C): 4.7227 | HS MAE: 2.8212 | IoU: 0.1841
+Epoch 18 | T.Loss: 2.2396 | V.Loss: 2.6070 | MAE (°C): 4.6500 | HS MAE: 2.7061 | IoU: 0.1785
+Epoch 19 | T.Loss: 2.2472 | V.Loss: 2.5604 | MAE (°C): 4.5807 | HS MAE: 2.6125 | IoU: 0.2108
+Epoch 20 | T.Loss: 2.2268 | V.Loss: 2.8537 | MAE (°C): 5.0547 | HS MAE: 3.0676 | IoU: 0.1879
+Epoch 21 | T.Loss: 2.1748 | V.Loss: 2.3819 | MAE (°C): 4.2129 | HS MAE: 2.3982 | IoU: 0.1863
+Epoch 22 | T.Loss: 2.2539 | V.Loss: 2.2568 | MAE (°C): 3.7663 | HS MAE: 2.3941 | IoU: 0.2064
+Epoch 23 | T.Loss: 2.2636 | V.Loss: 2.4996 | MAE (°C): 4.1949 | HS MAE: 2.7285 | IoU: 0.1875
+Epoch 24 | T.Loss: 2.1661 | V.Loss: 2.5009 | MAE (°C): 4.3158 | HS MAE: 2.6575 | IoU: 0.1998
+Epoch 25 | T.Loss: 2.2018 | V.Loss: 2.4654 | MAE (°C): 4.2151 | HS MAE: 2.6560 | IoU: 0.1867
+Epoch 26 | T.Loss: 2.2063 | V.Loss: 2.4437 | MAE (°C): 4.0393 | HS MAE: 2.7138 | IoU: 0.1822
+Epoch 27 | T.Loss: 2.1833 | V.Loss: 2.6663 | MAE (°C): 4.6604 | HS MAE: 2.8727 | IoU: 0.1866
+Epoch 28 | T.Loss: 2.2129 | V.Loss: 2.5215 | MAE (°C): 4.2982 | HS MAE: 2.7197 | IoU: 0.1918
+Epoch 29 | T.Loss: 2.2146 | V.Loss: 2.3714 | MAE (°C): 3.9375 | HS MAE: 2.5731 | IoU: 0.1964
+Epoch 30 | T.Loss: 2.1675 | V.Loss: 2.6098 | MAE (°C): 4.4859 | HS MAE: 2.8187 | IoU: 0.1999
+Epoch 31 | T.Loss: 2.2012 | V.Loss: 2.7226 | MAE (°C): 4.5848 | HS MAE: 3.0536 | IoU: 0.1975
+Epoch 32 | T.Loss: 2.1199 | V.Loss: 2.7789 | MAE (°C): 4.6180 | HS MAE: 3.1678 | IoU: 0.1977
+Epoch 33 | T.Loss: 2.1427 | V.Loss: 2.4797 | MAE (°C): 4.1836 | HS MAE: 2.6621 | IoU: 0.2002
+Epoch 34 | T.Loss: 2.1150 | V.Loss: 2.7194 | MAE (°C): 4.5937 | HS MAE: 3.0375 | IoU: 0.2005
+Epoch 35 | T.Loss: 2.1865 | V.Loss: 2.6736 | MAE (°C): 4.5329 | HS MAE: 2.9583 | IoU: 0.1977
+Epoch 36 | T.Loss: 2.1351 | V.Loss: 2.6731 | MAE (°C): 4.4633 | HS MAE: 2.9975 | IoU: 0.1926
+Epoch 37 | T.Loss: 2.1384 | V.Loss: 2.6826 | MAE (°C): 4.5733 | HS MAE: 2.9513 | IoU: 0.1961
+Epoch 38 | T.Loss: 2.1508 | V.Loss: 2.5070 | MAE (°C): 4.1651 | HS MAE: 2.7772 | IoU: 0.1944
+Epoch 39 | T.Loss: 2.1754 | V.Loss: 2.6668 | MAE (°C): 4.4578 | HS MAE: 2.9860 | IoU: 0.1922
+Epoch 40 | T.Loss: 2.1108 | V.Loss: 2.6258 | MAE (°C): 4.4360 | HS MAE: 2.8968 | IoU: 0.1930
+
+--- Iniciando FOLD 4 ---
+Epoch 01 | T.Loss: 2.5622 | V.Loss: 2.8296 | MAE (°C): 3.8621 | HS MAE: 3.8147 | IoU: 0.1537
+Epoch 02 | T.Loss: 2.3231 | V.Loss: 2.7850 | MAE (°C): 4.3492 | HS MAE: 3.3673 | IoU: 0.1596
+Epoch 03 | T.Loss: 2.3398 | V.Loss: 2.7752 | MAE (°C): 3.8881 | HS MAE: 3.6511 | IoU: 0.1449
+Epoch 04 | T.Loss: 2.2625 | V.Loss: 2.7619 | MAE (°C): 4.3223 | HS MAE: 3.3034 | IoU: 0.1515
+Epoch 05 | T.Loss: 2.2211 | V.Loss: 2.7206 | MAE (°C): 3.9270 | HS MAE: 3.5189 | IoU: 0.1592
+Epoch 06 | T.Loss: 2.2081 | V.Loss: 2.8054 | MAE (°C): 4.5556 | HS MAE: 3.3380 | IoU: 0.1455
+Epoch 07 | T.Loss: 2.1811 | V.Loss: 2.8500 | MAE (°C): 4.1968 | HS MAE: 3.6452 | IoU: 0.1126
+Epoch 08 | T.Loss: 2.1533 | V.Loss: 2.8669 | MAE (°C): 3.9917 | HS MAE: 3.7934 | IoU: 0.1337
+Epoch 09 | T.Loss: 2.1541 | V.Loss: 2.8158 | MAE (°C): 3.8660 | HS MAE: 3.7690 | IoU: 0.1504
+Epoch 10 | T.Loss: 2.1838 | V.Loss: 2.9952 | MAE (°C): 4.6851 | HS MAE: 3.7328 | IoU: 0.1120
+Epoch 11 | T.Loss: 2.1547 | V.Loss: 2.8075 | MAE (°C): 3.9638 | HS MAE: 3.6586 | IoU: 0.1619
+Epoch 12 | T.Loss: 2.1382 | V.Loss: 2.8577 | MAE (°C): 4.3480 | HS MAE: 3.5838 | IoU: 0.1524
+Epoch 13 | T.Loss: 2.1115 | V.Loss: 2.8427 | MAE (°C): 4.0008 | HS MAE: 3.7731 | IoU: 0.1607
+Epoch 14 | T.Loss: 2.0816 | V.Loss: 2.7612 | MAE (°C): 3.8356 | HS MAE: 3.6633 | IoU: 0.1698
+Epoch 15 | T.Loss: 2.0605 | V.Loss: 2.8149 | MAE (°C): 3.9568 | HS MAE: 3.6982 | IoU: 0.1658
+Epoch 16 | T.Loss: 2.1079 | V.Loss: 2.8176 | MAE (°C): 4.1895 | HS MAE: 3.5875 | IoU: 0.1752
+Epoch 17 | T.Loss: 2.0598 | V.Loss: 2.7845 | MAE (°C): 3.9015 | HS MAE: 3.6581 | IoU: 0.1654
+Epoch 18 | T.Loss: 2.0585 | V.Loss: 2.8273 | MAE (°C): 4.0665 | HS MAE: 3.6778 | IoU: 0.1729
+Epoch 19 | T.Loss: 2.0425 | V.Loss: 2.8840 | MAE (°C): 3.8381 | HS MAE: 3.9816 | IoU: 0.1636
+Epoch 20 | T.Loss: 2.0733 | V.Loss: 2.8001 | MAE (°C): 4.0003 | HS MAE: 3.6782 | IoU: 0.1689
+Epoch 21 | T.Loss: 2.0070 | V.Loss: 2.8468 | MAE (°C): 4.1689 | HS MAE: 3.6740 | IoU: 0.1664
+Epoch 22 | T.Loss: 2.0562 | V.Loss: 2.8706 | MAE (°C): 4.3997 | HS MAE: 3.6132 | IoU: 0.1603
+Epoch 23 | T.Loss: 2.0345 | V.Loss: 2.8135 | MAE (°C): 4.0682 | HS MAE: 3.6399 | IoU: 0.1705
+Epoch 24 | T.Loss: 1.9855 | V.Loss: 2.8767 | MAE (°C): 4.3349 | HS MAE: 3.6596 | IoU: 0.1717
+Epoch 25 | T.Loss: 1.9814 | V.Loss: 2.8261 | MAE (°C): 4.0976 | HS MAE: 3.6727 | IoU: 0.1724
+Epoch 26 | T.Loss: 2.0222 | V.Loss: 2.8218 | MAE (°C): 4.0910 | HS MAE: 3.6761 | IoU: 0.1702
+Epoch 27 | T.Loss: 1.9755 | V.Loss: 2.8015 | MAE (°C): 3.8552 | HS MAE: 3.7579 | IoU: 0.1761
+Epoch 28 | T.Loss: 2.0136 | V.Loss: 2.7975 | MAE (°C): 3.9972 | HS MAE: 3.6626 | IoU: 0.1743
+Epoch 29 | T.Loss: 1.9959 | V.Loss: 2.7982 | MAE (°C): 4.0042 | HS MAE: 3.6729 | IoU: 0.1752
+Epoch 30 | T.Loss: 1.9968 | V.Loss: 2.8310 | MAE (°C): 4.1383 | HS MAE: 3.6591 | IoU: 0.1649
+Epoch 31 | T.Loss: 2.0047 | V.Loss: 2.8045 | MAE (°C): 4.0857 | HS MAE: 3.6249 | IoU: 0.1707
+Epoch 32 | T.Loss: 1.9888 | V.Loss: 2.8330 | MAE (°C): 4.1214 | HS MAE: 3.6826 | IoU: 0.1715
+Epoch 33 | T.Loss: 1.9828 | V.Loss: 2.8131 | MAE (°C): 4.0114 | HS MAE: 3.6900 | IoU: 0.1749
+Epoch 34 | T.Loss: 1.9799 | V.Loss: 2.8310 | MAE (°C): 4.0923 | HS MAE: 3.6918 | IoU: 0.1694
+Epoch 35 | T.Loss: 1.9758 | V.Loss: 2.8123 | MAE (°C): 4.0190 | HS MAE: 3.6793 | IoU: 0.1734
+Epoch 36 | T.Loss: 1.9535 | V.Loss: 2.8044 | MAE (°C): 3.9632 | HS MAE: 3.7061 | IoU: 0.1754
+Epoch 37 | T.Loss: 1.9651 | V.Loss: 2.7983 | MAE (°C): 4.0114 | HS MAE: 3.6564 | IoU: 0.1713
+Epoch 38 | T.Loss: 1.9610 | V.Loss: 2.8137 | MAE (°C): 4.0856 | HS MAE: 3.6552 | IoU: 0.1703
+Epoch 39 | T.Loss: 1.9799 | V.Loss: 2.7883 | MAE (°C): 3.9646 | HS MAE: 3.6617 | IoU: 0.1697
+Epoch 40 | T.Loss: 1.9510 | V.Loss: 2.7884 | MAE (°C): 3.8969 | HS MAE: 3.6992 | IoU: 0.1732
+
+--- Iniciando FOLD 5 ---
+Epoch 01 | T.Loss: 2.5629 | V.Loss: 2.7913 | MAE (°C): 3.9241 | HS MAE: 3.5896 | IoU: 0.2356
+Epoch 02 | T.Loss: 2.3141 | V.Loss: 2.8197 | MAE (°C): 3.7627 | HS MAE: 3.8107 | IoU: 0.2680
+Epoch 03 | T.Loss: 2.3233 | V.Loss: 2.8712 | MAE (°C): 3.8420 | HS MAE: 3.8362 | IoU: 0.2332
+Epoch 04 | T.Loss: 2.3809 | V.Loss: 2.7841 | MAE (°C): 3.7035 | HS MAE: 3.7417 | IoU: 0.2742
+Epoch 05 | T.Loss: 2.3564 | V.Loss: 2.6980 | MAE (°C): 3.8061 | HS MAE: 3.4706 | IoU: 0.2370
+Epoch 06 | T.Loss: 2.2739 | V.Loss: 2.8555 | MAE (°C): 3.5687 | HS MAE: 4.0235 | IoU: 0.2648
+Epoch 07 | T.Loss: 2.2826 | V.Loss: 2.7284 | MAE (°C): 3.7039 | HS MAE: 3.6114 | IoU: 0.2279
+Epoch 08 | T.Loss: 2.3141 | V.Loss: 2.7223 | MAE (°C): 3.6634 | HS MAE: 3.6111 | IoU: 0.2724
+Epoch 09 | T.Loss: 2.3059 | V.Loss: 2.6174 | MAE (°C): 3.5297 | HS MAE: 3.5007 | IoU: 0.2836
+Epoch 10 | T.Loss: 2.2839 | V.Loss: 2.5672 | MAE (°C): 3.5503 | HS MAE: 3.3345 | IoU: 0.2747
+Epoch 11 | T.Loss: 2.2595 | V.Loss: 2.6412 | MAE (°C): 3.5974 | HS MAE: 3.5084 | IoU: 0.2721
+Epoch 12 | T.Loss: 2.2683 | V.Loss: 2.6719 | MAE (°C): 3.5660 | HS MAE: 3.6136 | IoU: 0.2523
+Epoch 13 | T.Loss: 2.2392 | V.Loss: 2.6684 | MAE (°C): 3.5913 | HS MAE: 3.5893 | IoU: 0.2576
+Epoch 14 | T.Loss: 2.2716 | V.Loss: 2.6790 | MAE (°C): 3.5257 | HS MAE: 3.6244 | IoU: 0.2180
+Epoch 15 | T.Loss: 2.2498 | V.Loss: 2.4725 | MAE (°C): 3.6380 | HS MAE: 3.0621 | IoU: 0.2837
+Epoch 16 | T.Loss: 2.2515 | V.Loss: 2.7829 | MAE (°C): 3.5171 | HS MAE: 3.9024 | IoU: 0.2822
+Epoch 17 | T.Loss: 2.2683 | V.Loss: 2.5793 | MAE (°C): 3.6462 | HS MAE: 3.2997 | IoU: 0.2661
+Epoch 18 | T.Loss: 2.2044 | V.Loss: 2.6142 | MAE (°C): 3.6451 | HS MAE: 3.4137 | IoU: 0.2832
+Epoch 19 | T.Loss: 2.2320 | V.Loss: 2.5187 | MAE (°C): 3.6505 | HS MAE: 3.1405 | IoU: 0.2784
+Epoch 20 | T.Loss: 2.2263 | V.Loss: 2.4667 | MAE (°C): 3.9018 | HS MAE: 2.8255 | IoU: 0.2734
+Epoch 21 | T.Loss: 2.2104 | V.Loss: 2.4569 | MAE (°C): 4.2038 | HS MAE: 2.6725 | IoU: 0.2447
+Epoch 22 | T.Loss: 2.2292 | V.Loss: 2.4810 | MAE (°C): 3.6397 | HS MAE: 3.0859 | IoU: 0.2669
+Epoch 23 | T.Loss: 2.1471 | V.Loss: 2.6342 | MAE (°C): 3.8874 | HS MAE: 3.2621 | IoU: 0.2676
+Epoch 24 | T.Loss: 2.2352 | V.Loss: 2.5519 | MAE (°C): 3.7972 | HS MAE: 3.1475 | IoU: 0.2533
+Epoch 25 | T.Loss: 2.1882 | V.Loss: 2.7060 | MAE (°C): 3.5054 | HS MAE: 3.7513 | IoU: 0.2626
+Epoch 26 | T.Loss: 2.1819 | V.Loss: 2.4365 | MAE (°C): 3.5116 | HS MAE: 3.0950 | IoU: 0.2868
+Epoch 27 | T.Loss: 2.1579 | V.Loss: 2.4432 | MAE (°C): 3.6720 | HS MAE: 3.0037 | IoU: 0.2642
+Epoch 28 | T.Loss: 2.2163 | V.Loss: 2.5213 | MAE (°C): 3.6579 | HS MAE: 3.1736 | IoU: 0.2885
+Epoch 29 | T.Loss: 2.1722 | V.Loss: 2.6664 | MAE (°C): 3.7094 | HS MAE: 3.4993 | IoU: 0.2655
+Epoch 30 | T.Loss: 2.1916 | V.Loss: 2.7298 | MAE (°C): 3.6210 | HS MAE: 3.7547 | IoU: 0.2878
+Epoch 31 | T.Loss: 2.1523 | V.Loss: 2.5608 | MAE (°C): 3.7027 | HS MAE: 3.2349 | IoU: 0.2427
+Epoch 32 | T.Loss: 2.1761 | V.Loss: 2.6850 | MAE (°C): 3.6757 | HS MAE: 3.5675 | IoU: 0.2346
+Epoch 33 | T.Loss: 2.1300 | V.Loss: 2.5906 | MAE (°C): 3.5719 | HS MAE: 3.3910 | IoU: 0.2932
+Epoch 34 | T.Loss: 2.1327 | V.Loss: 2.5576 | MAE (°C): 3.6897 | HS MAE: 3.2671 | IoU: 0.2880
+Epoch 35 | T.Loss: 2.1158 | V.Loss: 2.4340 | MAE (°C): 3.5718 | HS MAE: 3.0353 | IoU: 0.3011
+Epoch 36 | T.Loss: 2.1011 | V.Loss: 2.6467 | MAE (°C): 3.5788 | HS MAE: 3.5453 | IoU: 0.2915
+Epoch 37 | T.Loss: 2.1113 | V.Loss: 2.5949 | MAE (°C): 3.5078 | HS MAE: 3.4669 | IoU: 0.3004
+Epoch 38 | T.Loss: 2.1224 | V.Loss: 2.6433 | MAE (°C): 3.5948 | HS MAE: 3.5374 | IoU: 0.2914
+Epoch 39 | T.Loss: 2.0945 | V.Loss: 2.6007 | MAE (°C): 3.6382 | HS MAE: 3.3847 | IoU: 0.2782
+Epoch 40 | T.Loss: 2.1279 | V.Loss: 2.5212 | MAE (°C): 3.6164 | HS MAE: 3.2186 | IoU: 0.2710

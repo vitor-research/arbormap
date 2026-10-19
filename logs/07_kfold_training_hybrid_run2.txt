@@ -1,0 +1,176 @@
+Calculando estatísticas de normalização (816 arquivos de treino)...
+
+--- Iniciando FOLD 1 ---
+Fold 1 | Epoch 01 | T.Loss: 0.4008 | V.Loss: 0.3448 | MAE: 0.5658
+       -> R2: 0.3353 | Pearson: 0.5904 | Std(Pred): 0.6787 vs Std(Target): 0.9979
+Fold 1 | Epoch 02 | T.Loss: 0.3204 | V.Loss: 0.3083 | MAE: 0.5141
+       -> R2: 0.4038 | Pearson: 0.6407 | Std(Pred): 0.7075 vs Std(Target): 0.9979
+Fold 1 | Epoch 03 | T.Loss: 0.3021 | V.Loss: 0.3062 | MAE: 0.5201
+       -> R2: 0.4032 | Pearson: 0.6406 | Std(Pred): 0.6777 vs Std(Target): 0.9979
+Fold 1 | Epoch 04 | T.Loss: 0.2943 | V.Loss: 0.2937 | MAE: 0.4911
+       -> R2: 0.4194 | Pearson: 0.6562 | Std(Pred): 0.7515 vs Std(Target): 0.9979
+Fold 1 | Epoch 05 | T.Loss: 0.2882 | V.Loss: 0.2886 | MAE: 0.4954
+       -> R2: 0.4339 | Pearson: 0.6607 | Std(Pred): 0.6094 vs Std(Target): 0.9979
+Fold 1 | Epoch 06 | T.Loss: 0.2837 | V.Loss: 0.2878 | MAE: 0.4957
+       -> R2: 0.4347 | Pearson: 0.6618 | Std(Pred): 0.6060 vs Std(Target): 0.9979
+Fold 1 | Epoch 07 | T.Loss: 0.2815 | V.Loss: 0.2858 | MAE: 0.4858
+       -> R2: 0.4375 | Pearson: 0.6637 | Std(Pred): 0.6562 vs Std(Target): 0.9979
+Fold 1 | Epoch 08 | T.Loss: 0.2804 | V.Loss: 0.2814 | MAE: 0.4785
+       -> R2: 0.4467 | Pearson: 0.6691 | Std(Pred): 0.6968 vs Std(Target): 0.9979
+Fold 1 | Epoch 09 | T.Loss: 0.2816 | V.Loss: 0.2921 | MAE: 0.5040
+       -> R2: 0.4228 | Pearson: 0.6544 | Std(Pred): 0.5986 vs Std(Target): 0.9979
+Fold 1 | Epoch 10 | T.Loss: 0.2781 | V.Loss: 0.2881 | MAE: 0.4938
+       -> R2: 0.4311 | Pearson: 0.6576 | Std(Pred): 0.6494 vs Std(Target): 0.9979
+Fold 1 | Epoch 11 | T.Loss: 0.2777 | V.Loss: 0.2846 | MAE: 0.4814
+       -> R2: 0.4356 | Pearson: 0.6621 | Std(Pred): 0.7046 vs Std(Target): 0.9979
+Fold 1 | Epoch 12 | T.Loss: 0.2766 | V.Loss: 0.2840 | MAE: 0.4795
+       -> R2: 0.4359 | Pearson: 0.6639 | Std(Pred): 0.7295 vs Std(Target): 0.9979
+Fold 1 | Epoch 13 | T.Loss: 0.2759 | V.Loss: 0.2840 | MAE: 0.4834
+       -> R2: 0.4390 | Pearson: 0.6637 | Std(Pred): 0.6982 vs Std(Target): 0.9979
+Fold 1 | Epoch 14 | T.Loss: 0.2756 | V.Loss: 0.2867 | MAE: 0.4885
+       -> R2: 0.4304 | Pearson: 0.6579 | Std(Pred): 0.6733 vs Std(Target): 0.9979
+Fold 1 | Epoch 15 | T.Loss: 0.2721 | V.Loss: 0.2819 | MAE: 0.4812
+       -> R2: 0.4439 | Pearson: 0.6679 | Std(Pred): 0.7002 vs Std(Target): 0.9979
+Fold 1 | Epoch 16 | T.Loss: 0.2716 | V.Loss: 0.2871 | MAE: 0.4924
+       -> R2: 0.4323 | Pearson: 0.6576 | Std(Pred): 0.6494 vs Std(Target): 0.9979
+Fold 1 | Epoch 17 | T.Loss: 0.2697 | V.Loss: 0.2896 | MAE: 0.4992
+       -> R2: 0.4289 | Pearson: 0.6552 | Std(Pred): 0.6318 vs Std(Target): 0.9979
+Fold 1 | Epoch 18 | T.Loss: 0.2700 | V.Loss: 0.2880 | MAE: 0.4901
+       -> R2: 0.4274 | Pearson: 0.6559 | Std(Pred): 0.7070 vs Std(Target): 0.9979
+Fold 1 | Epoch 19 | T.Loss: 0.2716 | V.Loss: 0.2854 | MAE: 0.4857
+       -> R2: 0.4341 | Pearson: 0.6603 | Std(Pred): 0.7021 vs Std(Target): 0.9979
+Fold 1 | Epoch 20 | T.Loss: 0.2710 | V.Loss: 0.2968 | MAE: 0.5149
+       -> R2: 0.4115 | Pearson: 0.6515 | Std(Pred): 0.5698 vs Std(Target): 0.9979
+
+
+Calculando estatísticas de normalização (831 arquivos de treino)...
+
+--- Iniciando FOLD 2 ---
+Fold 2 | Epoch 01 | T.Loss: 0.3910 | V.Loss: 0.2971 | MAE: 0.5120
+       -> R2: 0.3910 | Pearson: 0.6376 | Std(Pred): 0.5161 vs Std(Target): 0.9977
+Fold 2 | Epoch 02 | T.Loss: 0.3136 | V.Loss: 0.2806 | MAE: 0.4923
+       -> R2: 0.4174 | Pearson: 0.6619 | Std(Pred): 0.6597 vs Std(Target): 0.9977
+Fold 2 | Epoch 03 | T.Loss: 0.2981 | V.Loss: 0.2643 | MAE: 0.4627
+       -> R2: 0.4467 | Pearson: 0.6685 | Std(Pred): 0.6562 vs Std(Target): 0.9977
+Fold 2 | Epoch 04 | T.Loss: 0.2921 | V.Loss: 0.2696 | MAE: 0.4834
+       -> R2: 0.4347 | Pearson: 0.6694 | Std(Pred): 0.6362 vs Std(Target): 0.9977
+Fold 2 | Epoch 05 | T.Loss: 0.2887 | V.Loss: 0.2599 | MAE: 0.4609
+       -> R2: 0.4571 | Pearson: 0.6762 | Std(Pred): 0.6655 vs Std(Target): 0.9977
+Fold 2 | Epoch 06 | T.Loss: 0.2831 | V.Loss: 0.2655 | MAE: 0.4726
+       -> R2: 0.4435 | Pearson: 0.6691 | Std(Pred): 0.7080 vs Std(Target): 0.9977
+Fold 2 | Epoch 07 | T.Loss: 0.2809 | V.Loss: 0.2668 | MAE: 0.4696
+       -> R2: 0.4346 | Pearson: 0.6675 | Std(Pred): 0.7705 vs Std(Target): 0.9977
+Fold 2 | Epoch 08 | T.Loss: 0.2808 | V.Loss: 0.2603 | MAE: 0.4573
+       -> R2: 0.4501 | Pearson: 0.6765 | Std(Pred): 0.7573 vs Std(Target): 0.9977
+Fold 2 | Epoch 09 | T.Loss: 0.2784 | V.Loss: 0.2578 | MAE: 0.4602
+       -> R2: 0.4581 | Pearson: 0.6781 | Std(Pred): 0.7163 vs Std(Target): 0.9977
+Fold 2 | Epoch 10 | T.Loss: 0.2781 | V.Loss: 0.2597 | MAE: 0.4611
+       -> R2: 0.4540 | Pearson: 0.6766 | Std(Pred): 0.7334 vs Std(Target): 0.9977
+Fold 2 | Epoch 11 | T.Loss: 0.2754 | V.Loss: 0.2582 | MAE: 0.4612
+       -> R2: 0.4574 | Pearson: 0.6773 | Std(Pred): 0.6660 vs Std(Target): 0.9977
+Fold 2 | Epoch 12 | T.Loss: 0.2766 | V.Loss: 0.2616 | MAE: 0.4652
+       -> R2: 0.4456 | Pearson: 0.6695 | Std(Pred): 0.7192 vs Std(Target): 0.9977
+Fold 2 | Epoch 13 | T.Loss: 0.2755 | V.Loss: 0.2598 | MAE: 0.4549
+       -> R2: 0.4480 | Pearson: 0.6775 | Std(Pred): 0.7769 vs Std(Target): 0.9977
+Fold 2 | Epoch 14 | T.Loss: 0.2753 | V.Loss: 0.2570 | MAE: 0.4481
+       -> R2: 0.4552 | Pearson: 0.6767 | Std(Pred): 0.7212 vs Std(Target): 0.9977
+Fold 2 | Epoch 15 | T.Loss: 0.2739 | V.Loss: 0.2582 | MAE: 0.4536
+       -> R2: 0.4499 | Pearson: 0.6759 | Std(Pred): 0.7578 vs Std(Target): 0.9977
+Fold 2 | Epoch 16 | T.Loss: 0.2741 | V.Loss: 0.2570 | MAE: 0.4636
+       -> R2: 0.4589 | Pearson: 0.6781 | Std(Pred): 0.6494 vs Std(Target): 0.9977
+Fold 2 | Epoch 17 | T.Loss: 0.2729 | V.Loss: 0.2595 | MAE: 0.4580
+       -> R2: 0.4476 | Pearson: 0.6738 | Std(Pred): 0.7524 vs Std(Target): 0.9977
+Fold 2 | Epoch 18 | T.Loss: 0.2731 | V.Loss: 0.2635 | MAE: 0.4653
+       -> R2: 0.4375 | Pearson: 0.6740 | Std(Pred): 0.7759 vs Std(Target): 0.9977
+Fold 2 | Epoch 19 | T.Loss: 0.2723 | V.Loss: 0.2579 | MAE: 0.4545
+       -> R2: 0.4542 | Pearson: 0.6782 | Std(Pred): 0.7476 vs Std(Target): 0.9977
+Fold 2 | Epoch 20 | T.Loss: 0.2719 | V.Loss: 0.2576 | MAE: 0.4659
+       -> R2: 0.4556 | Pearson: 0.6761 | Std(Pred): 0.6533 vs Std(Target): 0.9977
+
+Calculando estatísticas de normalização (861 arquivos de treino)...
+
+--- Iniciando FOLD 3 ---
+Fold 3 | Epoch 01 | T.Loss: 0.3558 | V.Loss: 0.3620 | MAE: 0.5983
+       -> R2: 0.3570 | Pearson: 0.6186 | Std(Pred): 0.4658 vs Std(Target): 1.0000
+Fold 3 | Epoch 02 | T.Loss: 0.3004 | V.Loss: 0.3347 | MAE: 0.5569
+       -> R2: 0.3970 | Pearson: 0.6337 | Std(Pred): 0.6279 vs Std(Target): 1.0000
+Fold 3 | Epoch 03 | T.Loss: 0.2837 | V.Loss: 0.3243 | MAE: 0.5335
+       -> R2: 0.4046 | Pearson: 0.6444 | Std(Pred): 0.7412 vs Std(Target): 1.0000
+Fold 3 | Epoch 04 | T.Loss: 0.2781 | V.Loss: 0.3190 | MAE: 0.5328
+       -> R2: 0.4161 | Pearson: 0.6520 | Std(Pred): 0.6255 vs Std(Target): 1.0000
+Fold 3 | Epoch 05 | T.Loss: 0.2733 | V.Loss: 0.3143 | MAE: 0.5270
+       -> R2: 0.4255 | Pearson: 0.6524 | Std(Pred): 0.6631 vs Std(Target): 1.0000
+Fold 3 | Epoch 06 | T.Loss: 0.2688 | V.Loss: 0.3126 | MAE: 0.5213
+       -> R2: 0.4270 | Pearson: 0.6558 | Std(Pred): 0.7100 vs Std(Target): 1.0000
+Fold 3 | Epoch 07 | T.Loss: 0.2671 | V.Loss: 0.3120 | MAE: 0.5224
+       -> R2: 0.4273 | Pearson: 0.6557 | Std(Pred): 0.7075 vs Std(Target): 1.0000
+Fold 3 | Epoch 08 | T.Loss: 0.2653 | V.Loss: 0.3108 | MAE: 0.5199
+       -> R2: 0.4296 | Pearson: 0.6564 | Std(Pred): 0.6919 vs Std(Target): 1.0000
+Fold 3 | Epoch 09 | T.Loss: 0.2651 | V.Loss: 0.3084 | MAE: 0.5174
+       -> R2: 0.4339 | Pearson: 0.6613 | Std(Pred): 0.7183 vs Std(Target): 1.0000
+Fold 3 | Epoch 10 | T.Loss: 0.2645 | V.Loss: 0.3084 | MAE: 0.5131
+       -> R2: 0.4267 | Pearson: 0.6601 | Std(Pred): 0.7207 vs Std(Target): 1.0000
+Fold 3 | Epoch 11 | T.Loss: 0.2638 | V.Loss: 0.3081 | MAE: 0.5161
+       -> R2: 0.4320 | Pearson: 0.6589 | Std(Pred): 0.6992 vs Std(Target): 1.0000
+Fold 3 | Epoch 12 | T.Loss: 0.2624 | V.Loss: 0.3098 | MAE: 0.5190
+       -> R2: 0.4284 | Pearson: 0.6575 | Std(Pred): 0.6606 vs Std(Target): 1.0000
+Fold 3 | Epoch 13 | T.Loss: 0.2615 | V.Loss: 0.3076 | MAE: 0.5161
+       -> R2: 0.4334 | Pearson: 0.6605 | Std(Pred): 0.7134 vs Std(Target): 1.0000
+Fold 3 | Epoch 14 | T.Loss: 0.2599 | V.Loss: 0.3068 | MAE: 0.5099
+       -> R2: 0.4288 | Pearson: 0.6614 | Std(Pred): 0.7383 vs Std(Target): 1.0000
+Fold 3 | Epoch 15 | T.Loss: 0.2606 | V.Loss: 0.3075 | MAE: 0.5206
+       -> R2: 0.4363 | Pearson: 0.6615 | Std(Pred): 0.6499 vs Std(Target): 1.0000
+Fold 3 | Epoch 16 | T.Loss: 0.2596 | V.Loss: 0.3062 | MAE: 0.5172
+       -> R2: 0.4367 | Pearson: 0.6638 | Std(Pred): 0.7129 vs Std(Target): 1.0000
+Fold 3 | Epoch 17 | T.Loss: 0.2589 | V.Loss: 0.3054 | MAE: 0.5092
+       -> R2: 0.4331 | Pearson: 0.6648 | Std(Pred): 0.7285 vs Std(Target): 1.0000
+Fold 3 | Epoch 18 | T.Loss: 0.2581 | V.Loss: 0.3073 | MAE: 0.5109
+       -> R2: 0.4289 | Pearson: 0.6602 | Std(Pred): 0.7290 vs Std(Target): 1.0000
+Fold 3 | Epoch 19 | T.Loss: 0.2580 | V.Loss: 0.3063 | MAE: 0.5088
+       -> R2: 0.4305 | Pearson: 0.6627 | Std(Pred): 0.7407 vs Std(Target): 1.0000
+Fold 3 | Epoch 20 | T.Loss: 0.2572 | V.Loss: 0.3038 | MAE: 0.5142
+       -> R2: 0.4423 | Pearson: 0.6651 | Std(Pred): 0.6738 vs Std(Target): 1.0000
+
+Calculando estatísticas de normalização (825 arquivos de treino)...
+
+--- Iniciando FOLD 5 ---
+Fold 5 | Epoch 01 | T.Loss: 0.3859 | V.Loss: 0.3068 | MAE: 0.5174
+       -> R2: 0.3454 | Pearson: 0.5942 | Std(Pred): 0.6479 vs Std(Target): 1.0000
+Fold 5 | Epoch 02 | T.Loss: 0.3107 | V.Loss: 0.2900 | MAE: 0.5048
+       -> R2: 0.3763 | Pearson: 0.6136 | Std(Pred): 0.6260 vs Std(Target): 1.0000
+Fold 5 | Epoch 03 | T.Loss: 0.2936 | V.Loss: 0.2855 | MAE: 0.4969
+       -> R2: 0.3739 | Pearson: 0.6131 | Std(Pred): 0.6348 vs Std(Target): 1.0000
+Fold 5 | Epoch 04 | T.Loss: 0.2886 | V.Loss: 0.2828 | MAE: 0.4952
+       -> R2: 0.3779 | Pearson: 0.6175 | Std(Pred): 0.6689 vs Std(Target): 1.0000
+Fold 5 | Epoch 05 | T.Loss: 0.2829 | V.Loss: 0.2795 | MAE: 0.4898
+       -> R2: 0.3781 | Pearson: 0.6153 | Std(Pred): 0.6382 vs Std(Target): 1.0000
+Fold 5 | Epoch 06 | T.Loss: 0.2773 | V.Loss: 0.2804 | MAE: 0.4868
+       -> R2: 0.3678 | Pearson: 0.6165 | Std(Pred): 0.7207 vs Std(Target): 1.0000
+Fold 5 | Epoch 07 | T.Loss: 0.2761 | V.Loss: 0.2763 | MAE: 0.4808
+       -> R2: 0.3825 | Pearson: 0.6221 | Std(Pred): 0.6875 vs Std(Target): 1.0000
+Fold 5 | Epoch 08 | T.Loss: 0.2743 | V.Loss: 0.2791 | MAE: 0.4812
+       -> R2: 0.3707 | Pearson: 0.6247 | Std(Pred): 0.7642 vs Std(Target): 1.0000
+Fold 5 | Epoch 09 | T.Loss: 0.2732 | V.Loss: 0.2748 | MAE: 0.4766
+       -> R2: 0.3826 | Pearson: 0.6282 | Std(Pred): 0.7354 vs Std(Target): 1.0000
+Fold 5 | Epoch 10 | T.Loss: 0.2712 | V.Loss: 0.2771 | MAE: 0.4842
+       -> R2: 0.3787 | Pearson: 0.6244 | Std(Pred): 0.7275 vs Std(Target): 1.0000
+Fold 5 | Epoch 11 | T.Loss: 0.2720 | V.Loss: 0.2755 | MAE: 0.4849
+       -> R2: 0.3864 | Pearson: 0.6268 | Std(Pred): 0.7036 vs Std(Target): 1.0000
+Fold 5 | Epoch 12 | T.Loss: 0.2712 | V.Loss: 0.2764 | MAE: 0.4841
+       -> R2: 0.3841 | Pearson: 0.6285 | Std(Pred): 0.7266 vs Std(Target): 1.0000
+Fold 5 | Epoch 13 | T.Loss: 0.2697 | V.Loss: 0.2751 | MAE: 0.4783
+       -> R2: 0.3825 | Pearson: 0.6271 | Std(Pred): 0.7305 vs Std(Target): 1.0000
+Fold 5 | Epoch 14 | T.Loss: 0.2684 | V.Loss: 0.2775 | MAE: 0.4880
+       -> R2: 0.3823 | Pearson: 0.6218 | Std(Pred): 0.6782 vs Std(Target): 1.0000
+Fold 5 | Epoch 15 | T.Loss: 0.2673 | V.Loss: 0.2729 | MAE: 0.4791
+       -> R2: 0.3885 | Pearson: 0.6265 | Std(Pred): 0.6865 vs Std(Target): 1.0000
+Fold 5 | Epoch 16 | T.Loss: 0.2655 | V.Loss: 0.2737 | MAE: 0.4798
+       -> R2: 0.3898 | Pearson: 0.6299 | Std(Pred): 0.7134 vs Std(Target): 1.0000
+Fold 5 | Epoch 17 | T.Loss: 0.2667 | V.Loss: 0.2704 | MAE: 0.4763
+       -> R2: 0.3973 | Pearson: 0.6324 | Std(Pred): 0.6831 vs Std(Target): 1.0000
+Fold 5 | Epoch 18 | T.Loss: 0.2656 | V.Loss: 0.2768 | MAE: 0.4935
+       -> R2: 0.3916 | Pearson: 0.6260 | Std(Pred): 0.6226 vs Std(Target): 1.0000
+Fold 5 | Epoch 19 | T.Loss: 0.2655 | V.Loss: 0.2783 | MAE: 0.4900
+       -> R2: 0.3828 | Pearson: 0.6208 | Std(Pred): 0.6719 vs Std(Target): 1.0000
+Fold 5 | Epoch 20 | T.Loss: 0.2664 | V.Loss: 0.2757 | MAE: 0.4785
+       -> R2: 0.3843 | Pearson: 0.6307 | Std(Pred): 0.7441 vs Std(Target): 1.0000

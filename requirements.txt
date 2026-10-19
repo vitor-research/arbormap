@@ -1,0 +1,9 @@
+numpy
+torch
+scikit-learn
+matplotlib
+opencv-python
+earthengine-api
+geemap
+geopandas
+requests

@@ -1,0 +1,20 @@
+☁️ Filtrando 1036 imagens...
+ -> Imagens válidas mantidas: 847
+
+
+🌳 INICIANDO SIMULAÇÃO DE INTERVENÇÃO (Imagem Índice: 0)
+======================================================================
+✅ Mapa espacial gerado (Budget 45): 'figura_artigo_espacial.png'
+
+📈 Executando análise paramétrica (Sensibilidade de Orçamento)...
+   - Budget  10: Multi (-0.44°C) | Gulosa (-0.61°C)
+   - Budget  20: Multi (-0.70°C) | Gulosa (-0.89°C)
+   - Budget  30: Multi (-1.03°C) | Gulosa (-1.09°C)
+   - Budget  40: Multi (-2.82°C) | Gulosa (-1.61°C)
+   - Budget  50: Multi (-3.13°C) | Gulosa (-1.79°C)
+   - Budget  75: Multi (-3.50°C) | Gulosa (-3.32°C)
+   - Budget 100: Multi (-3.94°C) | Gulosa (-3.42°C)
+   - Budget 150: Multi (-4.41°C) | Gulosa (-3.75°C)
+✅ Gráfico de sensibilidade salvo em: 'figura_artigo_sensibilidade.png'
+
+🎉 Todas as simulações foram concluídas com sucesso!

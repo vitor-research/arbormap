@@ -1,0 +1,44 @@
+======================================================================
+🚀 TESTE DE SANIDADE: OVERFIT EM 1 BATCH
+======================================================================
+Epoch 00 | Loss: 0.8203 | MAE (°C): 6.9079 | HS MAE (°C): 9.4483 | HS IoU: 0.0000
+Epoch 10 | Loss: 0.4820 | MAE (°C): 4.3953 | HS MAE (°C): 2.0542 | HS IoU: 0.2618
+Epoch 20 | Loss: 0.4127 | MAE (°C): 3.8913 | HS MAE (°C): 1.8560 | HS IoU: 0.3111
+Epoch 30 | Loss: 0.3932 | MAE (°C): 3.7063 | HS MAE (°C): 1.9375 | HS IoU: 0.2877
+Epoch 40 | Loss: 0.3763 | MAE (°C): 3.5253 | HS MAE (°C): 1.8247 | HS IoU: 0.3148
+Epoch 49 | Loss: 0.3337 | MAE (°C): 3.0075 | HS MAE (°C): 1.7288 | HS IoU: 0.3450
+======================================================================
+
+2. Iniciando K-Fold Cross Validation Espacial...
+
+--- Iniciando FOLD 1 ---
+Epoch 01 | T.Loss: 0.6601 | V.Loss: 0.6243 | MAE (°C): 4.5407 | HS MAE (°C): 3.4320 | IoU: 0.1099
+Epoch 02 | T.Loss: 0.6331 | V.Loss: 0.6547 | MAE (°C): 4.8926 | HS MAE (°C): 3.3528 | IoU: 0.1466
+Epoch 03 | T.Loss: 0.6210 | V.Loss: 0.6628 | MAE (°C): 4.9344 | HS MAE (°C): 3.3973 | IoU: 0.1550
+Epoch 04 | T.Loss: 0.6153 | V.Loss: 0.6113 | MAE (°C): 4.3474 | HS MAE (°C): 3.6184 | IoU: 0.0833
+Epoch 05 | T.Loss: 0.6089 | V.Loss: 0.6218 | MAE (°C): 4.4851 | HS MAE (°C): 2.9698 | IoU: 0.1219
+Epoch 06 | T.Loss: 0.6049 | V.Loss: 0.6023 | MAE (°C): 4.2333 | HS MAE (°C): 3.4622 | IoU: 0.0768
+Epoch 07 | T.Loss: 0.6001 | V.Loss: 0.6131 | MAE (°C): 4.3761 | HS MAE (°C): 3.3390 | IoU: 0.1142
+
+
+Epoch 00 | Loss: 0.8848 | MAE (°C): 6.6038 | HS MAE (°C): 9.0142 | HS IoU: 0.0000
+Epoch 10 | Loss: 0.4996 | MAE (°C): 4.3854 | HS MAE (°C): 2.4855 | HS IoU: 0.3206
+Epoch 20 | Loss: 0.4273 | MAE (°C): 3.8602 | HS MAE (°C): 1.6026 | HS IoU: 0.3454
+Epoch 30 | Loss: 0.4076 | MAE (°C): 3.7151 | HS MAE (°C): 1.4968 | HS IoU: 0.3587
+Epoch 40 | Loss: 0.3820 | MAE (°C): 3.3324 | HS MAE (°C): 1.8129 | HS IoU: 0.3302
+Epoch 49 | Loss: 0.3510 | MAE (°C): 2.9762 | HS MAE (°C): 1.6706 | HS IoU: 0.3458
+======================================================================
+
+2. Iniciando K-Fold Cross Validation Espacial...
+
+--- Iniciando FOLD 1 ---
+Epoch 01 | T.Loss: 0.7327 | V.Loss: 0.6930 | MAE (°C): 4.6921 | HS MAE (°C): 3.0628 | IoU: 0.1469
+Epoch 02 | T.Loss: 0.6954 | V.Loss: 0.7259 | MAE (°C): 5.0013 | HS MAE (°C): 3.2086 | IoU: 0.1631
+Epoch 03 | T.Loss: 0.6780 | V.Loss: 0.7297 | MAE (°C): 5.0322 | HS MAE (°C): 3.1791 | IoU: 0.1636
+Epoch 04 | T.Loss: 0.6649 | V.Loss: 0.6795 | MAE (°C): 4.4211 | HS MAE (°C): 3.4123 | IoU: 0.1084
+Epoch 05 | T.Loss: 0.6502 | V.Loss: 0.6909 | MAE (°C): 4.6347 | HS MAE (°C): 2.9222 | IoU: 0.1438
+Epoch 06 | T.Loss: 0.6378 | V.Loss: 0.6757 | MAE (°C): 4.4536 | HS MAE (°C): 3.1460 | IoU: 0.1197
+Epoch 07 | T.Loss: 0.6289 | V.Loss: 0.7380 | MAE (°C): 4.9418 | HS MAE (°C): 3.4835 | IoU: 0.1455
+Epoch 08 | T.Loss: 0.6162 | V.Loss: 0.7074 | MAE (°C): 4.6237 | HS MAE (°C): 3.4480 | IoU: 0.1251
+Epoch 09 | T.Loss: 0.6054 | V.Loss: 0.7217 | MAE (°C): 4.8828 | HS MAE (°C): 3.1061 | IoU: 0.1511
+Epoch 10 | T.Loss: 0.5949 | V.Loss: 0.6952 | MAE (°C): 4.4401 | HS MAE (°C): 2.6927 | IoU: 0.1081

@@ -1,0 +1,142 @@
+Filtrando 1058 imagens (Limite de Nuvem: >30.0%) em paralelo...
+ -> Imagens descartadas (Muito nubladas): 350
+ -> Imagens válidas mantidas para treino: 708
+
+
+========================================
+ Iniciando Fold 1/5
+========================================
+Calculando limites ROBUSTOS (Percentis 1 e 99) em paralelo...
+
+--- Iniciando Teste de Sanidade (Overfit em 1 Batch) ---
+Epoch 1/30 | Loss do Batch: 0.123537
+Epoch 10/30 | Loss do Batch: 0.012432
+Epoch 20/30 | Loss do Batch: 0.008288
+Epoch 30/30 | Loss do Batch: 0.006439
+Teste finalizado. O modelo será re-instanciado para o treino principal.
+
+Iniciando treinamento real...
+
+========================================
+Iniciando Treinamento - Fold 1
+========================================
+Epoch 01/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.03459  |  Val = 0.01086
+  ↳ Temp:  RMSE = 6.46°  |  MAE = 4.96°
+  ↳ Zonas: Hotspot MAE = 6.25°  |  IoU = 0.1591  ⭐ [NOVO RECORDE SALVO]
+Epoch 02/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01370  |  Val = 0.00726
+  ↳ Temp:  RMSE = 5.41°  |  MAE = 4.17°
+  ↳ Zonas: Hotspot MAE = 5.18°  |  IoU = 0.1916  ⭐ [NOVO RECORDE SALVO]
+Epoch 03/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01217  |  Val = 0.00691
+  ↳ Temp:  RMSE = 5.29°  |  MAE = 3.90°
+  ↳ Zonas: Hotspot MAE = 4.26°  |  IoU = 0.2206  ⭐ [NOVO RECORDE SALVO]
+Epoch 04/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01170  |  Val = 0.00778
+  ↳ Temp:  RMSE = 5.56°  |  MAE = 4.39°
+  ↳ Zonas: Hotspot MAE = 5.47°  |  IoU = 0.1522
+Epoch 05/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01179  |  Val = 0.00553
+  ↳ Temp:  RMSE = 4.76°  |  MAE = 3.57°
+  ↳ Zonas: Hotspot MAE = 4.66°  |  IoU = 0.2129
+Epoch 06/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01162  |  Val = 0.00716
+  ↳ Temp:  RMSE = 4.79°  |  MAE = 3.36°
+  ↳ Zonas: Hotspot MAE = 4.27°  |  IoU = 0.2171
+Epoch 07/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01250  |  Val = 0.00658
+  ↳ Temp:  RMSE = 5.13°  |  MAE = 3.64°
+  ↳ Zonas: Hotspot MAE = 4.23°  |  IoU = 0.2241  ⭐ [NOVO RECORDE SALVO]
+Epoch 08/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01169  |  Val = 0.00664
+  ↳ Temp:  RMSE = 5.10°  |  MAE = 3.91°
+  ↳ Zonas: Hotspot MAE = 4.64°  |  IoU = 0.1632
+Epoch 09/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01070  |  Val = 0.00609
+  ↳ Temp:  RMSE = 4.98°  |  MAE = 4.01°
+  ↳ Zonas: Hotspot MAE = 4.64°  |  IoU = 0.1938
+Epoch 10/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01077  |  Val = 0.00513
+  ↳ Temp:  RMSE = 4.48°  |  MAE = 3.33°
+  ↳ Zonas: Hotspot MAE = 4.08°  |  IoU = 0.2435  ⭐ [NOVO RECORDE SALVO]
+Epoch 11/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01066  |  Val = 0.00488
+  ↳ Temp:  RMSE = 4.43°  |  MAE = 3.34°
+  ↳ Zonas: Hotspot MAE = 4.35°  |  IoU = 0.2110
+Epoch 12/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01049  |  Val = 0.00477
+  ↳ Temp:  RMSE = 4.39°  |  MAE = 3.25°
+  ↳ Zonas: Hotspot MAE = 4.49°  |  IoU = 0.2206
+Epoch 13/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01087  |  Val = 0.00500
+  ↳ Temp:  RMSE = 4.49°  |  MAE = 3.35°
+  ↳ Zonas: Hotspot MAE = 4.37°  |  IoU = 0.2292
+Epoch 14/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01026  |  Val = 0.00416
+  ↳ Temp:  RMSE = 4.13°  |  MAE = 3.18°
+  ↳ Zonas: Hotspot MAE = 3.78°  |  IoU = 0.2427  ⭐ [NOVO RECORDE SALVO]
+Epoch 15/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01028  |  Val = 0.00456
+  ↳ Temp:  RMSE = 4.30°  |  MAE = 3.30°
+  ↳ Zonas: Hotspot MAE = 3.94°  |  IoU = 0.2442
+Epoch 16/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.00985  |  Val = 0.00441
+  ↳ Temp:  RMSE = 4.19°  |  MAE = 3.08°
+  ↳ Zonas: Hotspot MAE = 3.96°  |  IoU = 0.2365
+Epoch 17/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01009  |  Val = 0.00896
+  ↳ Temp:  RMSE = 5.55°  |  MAE = 4.15°
+  ↳ Zonas: Hotspot MAE = 6.21°  |  IoU = 0.1393
+Epoch 18/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01015  |  Val = 0.00440
+  ↳ Temp:  RMSE = 4.17°  |  MAE = 3.09°
+  ↳ Zonas: Hotspot MAE = 4.09°  |  IoU = 0.2347
+Epoch 19/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.00977  |  Val = 0.00391
+  ↳ Temp:  RMSE = 4.00°  |  MAE = 3.04°
+  ↳ Zonas: Hotspot MAE = 3.95°  |  IoU = 0.2308
+Epoch 20/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.01045  |  Val = 0.00476
+  ↳ Temp:  RMSE = 4.41°  |  MAE = 3.31°
+  ↳ Zonas: Hotspot MAE = 4.59°  |  IoU = 0.2137
+Epoch 21/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.00983  |  Val = 0.00485
+  ↳ Temp:  RMSE = 4.42°  |  MAE = 3.26°
+  ↳ Zonas: Hotspot MAE = 5.00°  |  IoU = 0.1869
+Epoch 22/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.00958  |  Val = 0.00455
+  ↳ Temp:  RMSE = 4.17°  |  MAE = 3.08°
+  ↳ Zonas: Hotspot MAE = 3.96°  |  IoU = 0.2322
+Epoch 23/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.00949  |  Val = 0.00489
+  ↳ Temp:  RMSE = 4.44°  |  MAE = 3.49°
+  ↳ Zonas: Hotspot MAE = 4.47°  |  IoU = 0.1973
+Epoch 24/30 | LR: 0.000100
+  ↳ Loss:  Train = 0.00994  |  Val = 0.00423
+  ↳ Temp:  RMSE = 4.16°  |  MAE = 3.15°
+  ↳ Zonas: Hotspot MAE = 4.11°  |  IoU = 0.2187
+Epoch 25/30 | LR: 0.000050
+  ↳ Loss:  Train = 0.00993  |  Val = 0.00434
+  ↳ Temp:  RMSE = 4.14°  |  MAE = 3.07°
+  ↳ Zonas: Hotspot MAE = 4.14°  |  IoU = 0.2237
+Epoch 26/30 | LR: 0.000050
+  ↳ Loss:  Train = 0.00901  |  Val = 0.00540
+  ↳ Temp:  RMSE = 4.45°  |  MAE = 3.20°
+  ↳ Zonas: Hotspot MAE = 4.35°  |  IoU = 0.1958
+Epoch 27/30 | LR: 0.000050
+  ↳ Loss:  Train = 0.00905  |  Val = 0.00481
+  ↳ Temp:  RMSE = 4.39°  |  MAE = 3.45°
+  ↳ Zonas: Hotspot MAE = 4.85°  |  IoU = 0.1648
+Epoch 28/30 | LR: 0.000050
+  ↳ Loss:  Train = 0.00919  |  Val = 0.00425
+  ↳ Temp:  RMSE = 4.14°  |  MAE = 3.04°
+  ↳ Zonas: Hotspot MAE = 4.04°  |  IoU = 0.2447
+Epoch 29/30 | LR: 0.000050
+  ↳ Loss:  Train = 0.00905  |  Val = 0.00455
+  ↳ Temp:  RMSE = 4.23°  |  MAE = 3.25°
+  ↳ Zonas: Hotspot MAE = 4.50°  |  IoU = 0.1944
+Epoch 30/30 | LR: 0.000025
+  ↳ Loss:  Train = 0.00884  |  Val = 0.00400
+  ↳ Temp:  RMSE = 4.00°  |  MAE = 2.95°
+  ↳ Zonas: Hotspot MAE = 3.85°  |  IoU = 0.2376

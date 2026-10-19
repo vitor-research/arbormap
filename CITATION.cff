@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "Se usar este software, cite-o conforme abaixo."
+title: "ARBORMAP: previsão de ilhas de calor e indicação de áreas prioritárias para arborização com inteligência artificial"
+type: software
+authors:
+  - family-names: Rodrigues
+    given-names: Vítor Emanuel da Silva
+    affiliation: "IFPI – Campus Teresina Central"
+  - family-names: Sousa
+    given-names: Abraão Lima
+    affiliation: "IFPI – Campus Teresina Central"
+  - family-names: Pereira
+    given-names: Adriano Cleyton da Silva
+    affiliation: "IFPI – Campus Teresina Central"
+version: 1.0.0
+date-released: 2026-10-20
+repository-code: "https://github.com/vitor-research/arbormap"
+license: MIT
+keywords:
+  - ilhas de calor urbanas
+  - deep learning
+  - arborização urbana
+  - sensoriamento remoto
