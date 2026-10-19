@@ -53,6 +53,15 @@ python src/arbormap/decision/baselines.py
 
 Todo o treinamento do modelo final foi executado em GPU T4 gratuita do Google Colab.
 
+### Refazer os resultados com a UrbanHeatNet (Colab)
+
+O notebook `notebooks/refazer_urbanheatnet.ipynb` executa, em sequência e com retomada automática se a sessão cair:
+
+1. `model/train_urbanheatnet.py`: treino da UrbanHeatNet (célula 32) nos cinco folds da Tabela 1, com estatísticas de normalização por fold, log completo e `tabela2.csv` gerada do próprio histórico;
+2. `analysis/figures_urbanheatnet.py`: Figuras 2 e 3 a partir do histórico salvo;
+3. `decision/simulate_urbanheatnet.py`: simulação em Teresina com o modelo do fold em que Teresina é validação (seleção multicritério, corredores por morfologia, baselines gulosa e aleatória, Figuras 4 a 6);
+4. `decision/export_map.py`: arquivos georreferenciados do mapa interativo (`*_lst_pred`, `*_mask_inviavel`, `*_corredores.geojson`, `bounds.json`).
+
 ## Resultados principais
 
 | Métrica (validação cruzada por cidade, k = 5) | Valor |
