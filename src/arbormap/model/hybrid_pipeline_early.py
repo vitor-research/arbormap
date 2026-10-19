@@ -34,7 +34,7 @@ if torch.cuda.is_available():
     torch.backends.cudnn.benchmark = False
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-DATA_DIR = "/content/drive/MyDrive/heat_dataset_v3"
+DATA_DIR = os.environ.get("ARBORMAP_DATA_DIR", "./data")
 
 SEQ_LEN = 2 # Quantidade de instantes de tempo no histórico
 INPUT_CHANNELS = 8 # NDVI, NDWI, NDBI, DEM, LST_past, Coord_X, Coord_Y, Global_Mean_LST

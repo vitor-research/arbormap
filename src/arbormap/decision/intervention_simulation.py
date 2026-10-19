@@ -258,7 +258,7 @@ if __name__ == "__main__":
     INDICE_IMAGEM = 0
     BUDGET_ESPACIAL = 45
     BUDGETS_CURVA = [10, 20, 30, 40, 50, 75, 100, 150]
-    DATA_DIR = "/content/drive/MyDrive/heat_dataset_v3"
+    DATA_DIR = os.environ.get("ARBORMAP_DATA_DIR", "./data")
 
     # 1. Carrega o modelo novo (ConvLSTM)
     # OBS: Certifique-se de que a classe UNetConvLSTM já foi executada na célula anterior do seu Jupyter Notebook

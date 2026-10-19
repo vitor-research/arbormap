@@ -3,6 +3,8 @@ Driver do K-Fold (GroupKFold / KFold por cidade)
 
 Origem: notebook arbormap.ipynb, célula 14 (Google Colab).
 Laço de treino por fold com Grad-CAM do melhor modelo.
+Atenção: o laço termina com um `break` (comentado como "Testando apenas o fold 1"), herdado
+do notebook; como está, treina apenas o primeiro fold. Remova o `break` para rodar os cinco.
 Código preservado como no notebook; caminhos do Colab/Drive devem ser ajustados nas CONFIGURAÇÕES.
 """
 

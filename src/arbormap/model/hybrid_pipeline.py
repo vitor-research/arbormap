@@ -35,7 +35,7 @@ if torch.cuda.is_available():
     torch.backends.cudnn.benchmark = False
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-DATA_DIR = "/content/drive/MyDrive/heat_dataset_v3"
+DATA_DIR = os.environ.get("ARBORMAP_DATA_DIR", "./data")
 
 TOTAL_RAW_CHANNELS = 5
 CHANNELS_TO_KEEP = [0, 1, 2, 3, 4]

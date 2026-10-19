@@ -3,7 +3,7 @@ __pycache__/
 *.pt
 *.npy
 *.npz
-data/
+/data/
 heat_dataset*/
 landsat_dataset/
 .ipynb_checkpoints/

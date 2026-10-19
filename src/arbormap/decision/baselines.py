@@ -17,7 +17,7 @@ from pathlib import Path
 # 0. CONFIGURAÇÃO INICIAL E CARREGAMENTO
 # ==========================================
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-DATA_DIR = "/content/drive/MyDrive/heat_dataset_v3"
+DATA_DIR = os.environ.get("ARBORMAP_DATA_DIR", "./data")
 
 # Carregamento do Modelo
 checkpoint = torch.load("best_model_fold_0.pt", map_location=device, weights_only=False)

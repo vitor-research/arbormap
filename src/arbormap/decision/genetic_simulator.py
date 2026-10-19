@@ -6,6 +6,7 @@ Alternativa evolutiva ao motor de decisão; não usada nos resultados do artigo.
 Código preservado como no notebook; caminhos do Colab/Drive devem ser ajustados nas CONFIGURAÇÕES.
 """
 
+import os
 import torch
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
@@ -225,6 +226,6 @@ def executar_simulacao(model_path, data_root, num_trees=100):
 if __name__ == "__main__":
     executar_simulacao(
         model_path="best_model_fold_0.pt",
-        data_root="/content/drive/MyDrive/heat_dataset_v3",
+        data_root=os.environ.get("ARBORMAP_DATA_DIR", "./data"),
         num_trees=500  # Quantas árvores a prefeitura quer plantar?
     )

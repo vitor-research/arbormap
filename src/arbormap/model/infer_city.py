@@ -7,6 +7,7 @@ Código preservado como no notebook; caminhos do Colab/Drive devem ser ajustados
 """
 
 import torch
+import os
 import numpy as np
 from pathlib import Path
 
@@ -17,7 +18,7 @@ from pathlib import Path
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 MODEL_PATH = "best_model_fold_0.pt"     # altere para o fold desejado
-DATA_DIR = "/content/drive/MyDrive/heat_dataset_v3"
+DATA_DIR = os.environ.get("ARBORMAP_DATA_DIR", "./data")
 
 # As mesmas cidades usadas como validação no fold
 VAL_CITIES = [
