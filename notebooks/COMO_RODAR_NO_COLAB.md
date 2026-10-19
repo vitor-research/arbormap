@@ -1,6 +1,6 @@
 # Como rodar o ARBORMAP no Google Colab (passo a passo)
 
-Tempo total: cerca de 4 horas (o treino leva cerca de 45 min por fold, 5 folds). Não precisa ficar olhando; só não feche a aba.
+Tempo total: cerca de 10 a 11 horas na GPU T4 (medido: cerca de 250 s por época, 30 épocas por fold, 5 folds). Não precisa ficar olhando; deixe a aba aberta e o computador sem entrar em suspensão. Se a sessão cair, o treino continua de onde parou (passo 7).
 
 ## Antes de começar
 
@@ -21,7 +21,7 @@ Tempo total: cerca de 4 horas (o treino leva cerca de 45 min por fold, 5 folds).
 5. Se aparecer o aviso "Este notebook não foi criado pelo Google", clique em **Executar assim mesmo**.
 6. Na célula **"1. Caminhos"**, confira a linha `DATA_DRIVE = Path('/content/drive/MyDrive/heat_dataset_v3')`. Se o dataset estiver em outra pasta, troque o caminho. Rode a célula.
    - Deve aparecer algo como `1036 arquivos .npy em /content/heat_dataset_v3`. A cópia leva alguns minutos.
-7. Rode a célula **"2. Treino nos cinco folds"**. É a parte demorada (cerca de 4 h).
+7. Rode a célula **"2. Treino nos cinco folds"**. É a parte demorada (cerca de 2 h por fold).
    - A cada época aparece uma linha `Fold N | Epoch NN | ... MAE (°C) ...`.
    - **Se a sessão cair** (acontece no Colab gratuito): reconecte, ative a GPU de novo e rode as células 1, 2 e 3 outra vez. O treino continua de onde parou, porque tudo fica salvo em `Meu Drive/arbormap_urbanheatnet`.
 8. Quando aparecer **"TABELA 2 (melhor época por fold)"**, o treino terminou. Rode, em ordem, as células:
