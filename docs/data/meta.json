@@ -664,25 +664,33 @@
   "modelo": "best_hybrid_fold_0.pt"
  },
  "validacao_inmet": {
-  "n_dias": 82,
+  "n_dias": 80,
+  "n_descartados_lst_menor_15c": 2,
   "periodo": [
    "2018-04-24",
    "2024-09-15"
   ],
-  "pearson_lst_estacao_x_ar": 0.563,
-  "pearson_lst_caixa_x_ar": 0.533,
-  "pearson_lst_estacao_x_tmax": 0.471,
-  "inclinacao_lst_por_grau_ar": 6.76,
-  "lst_menos_ar_media_c": 6.1,
+  "pearson_lst_estacao_x_ar": 0.582,
+  "p_valor": 1.5e-08,
+  "inclinacao_ar_por_grau_lst": 0.15,
+  "seca": {
+   "n": 60,
+   "pearson": 0.621,
+   "inclinacao_ar_por_grau_lst": 0.186
+  },
+  "pearson_lst_caixa_x_ar": 0.501,
+  "pearson_lst_estacao_x_tmax": 0.659,
+  "inclinacao_lst_por_grau_ar": 2.26,
+  "lst_menos_ar_media_c": 8.32,
   "lst_menos_ar_seca_c": 8.23,
-  "lst_menos_ar_chuvosa_c": 0.3,
+  "lst_menos_ar_chuvosa_c": 8.6,
   "media_seca": {
    "lst": 39.3,
    "ar": 31.1
   },
   "media_chuvosa": {
-   "lst": 30.7,
-   "ar": 30.4
+   "lst": 39.3,
+   "ar": 30.7
   },
   "pontos": [
    {
@@ -731,12 +739,6 @@
     "data": "2018-11-18",
     "lst": 53.27,
     "ar": 31.9,
-    "seca": false
-   },
-   {
-    "data": "2018-12-20",
-    "lst": 12.25,
-    "ar": 29.5,
     "seca": false
    },
    {
@@ -962,12 +964,6 @@
     "seca": false
    },
    {
-    "data": "2022-12-23",
-    "lst": -123.15,
-    "ar": 25.0,
-    "seca": false
-   },
-   {
     "data": "2023-01-08",
     "lst": 30.78,
     "ar": 29.3,
@@ -1182,13 +1178,6 @@
    "codigo": "A312",
    "lat": -5.03472221,
    "lon": -42.80138888
-  },
-  "inclinacao_ar_por_grau_lst": 0.047,
-  "p_valor": 3.8e-08,
-  "seca": {
-   "n": 60,
-   "pearson": 0.621,
-   "inclinacao_ar_por_grau_lst": 0.186
   },
   "chuva_media_mensal_mm": {
    "1": 170.0,

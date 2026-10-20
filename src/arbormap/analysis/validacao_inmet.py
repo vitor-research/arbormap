@@ -103,11 +103,31 @@ def comparar(pasta_inmet, log=print):
         vistos.add(dia)
         linhas.append({"data": dia, "cena": it.id, **r, "tar_13utc": ar13.get(dia, np.nan), "tar_max_dia": tmax.get(dia, np.nan)})
     d = pd.DataFrame(linhas).dropna(subset=["tar_13utc"])
+    return estatisticas(d), d
+
+
+LST_MIN_VALIDA = 15.0   # mesmo critério do filtro de qualidade do dataset: abaixo de 15 °C é nuvem ou pixel corrompido
+
+
+def estatisticas(d):
+    d = d.copy()
+    d["data"] = pd.to_datetime(d["data"])
+    n_bruto = len(d)
+    d = d[d["lst_estacao"] >= LST_MIN_VALIDA]
     d["seca"] = d["data"].dt.month.isin([6, 7, 8, 9, 10])
     a, b = np.polyfit(d["tar_13utc"], d["lst_estacao"], 1)
+    a_ar, _ = np.polyfit(d["lst_estacao"], d["tar_13utc"], 1)
+    s = d[d["seca"]]
+    a_seca, _ = np.polyfit(s["lst_estacao"], s["tar_13utc"], 1)
+    from scipy import stats
+    r, p = stats.pearsonr(d["lst_estacao"], d["tar_13utc"])
     res = {
-        "n_dias": int(len(d)), "periodo": [str(d["data"].min().date()), str(d["data"].max().date())],
-        "pearson_lst_estacao_x_ar": round(float(d["lst_estacao"].corr(d["tar_13utc"])), 3),
+        "n_dias": int(len(d)), "n_descartados_lst_menor_15c": int(n_bruto - len(d)),
+        "periodo": [str(d["data"].min().date()), str(d["data"].max().date())],
+        "pearson_lst_estacao_x_ar": round(float(r), 3), "p_valor": float(f"{p:.1e}"),
+        "inclinacao_ar_por_grau_lst": round(float(a_ar), 3),
+        "seca": {"n": int(len(s)), "pearson": round(float(s["lst_estacao"].corr(s["tar_13utc"])), 3),
+                 "inclinacao_ar_por_grau_lst": round(float(a_seca), 3)},
         "pearson_lst_caixa_x_ar": round(float(d["lst_caixa"].corr(d["tar_13utc"])), 3),
         "pearson_lst_estacao_x_tmax": round(float(d["lst_estacao"].corr(d["tar_max_dia"])), 3),
         "inclinacao_lst_por_grau_ar": round(float(a), 2),
@@ -119,4 +139,4 @@ def comparar(pasta_inmet, log=print):
         "pontos": [{"data": str(r.data.date()), "lst": round(r.lst_estacao, 2), "ar": round(r.tar_13utc, 1), "seca": bool(r.seca)} for r in d.itertuples()],
         "estacao": ESTACAO,
     }
-    return res, d
+    return res

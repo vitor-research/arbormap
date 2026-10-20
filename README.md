@@ -62,28 +62,63 @@ O notebook `notebooks/refazer_urbanheatnet.ipynb` executa, em sequência e com r
 3. `decision/simulate_urbanheatnet.py`: simulação em Teresina com o modelo do fold em que Teresina é validação (seleção multicritério, corredores por morfologia, baselines gulosa e aleatória, Figuras 4 a 6);
 4. `decision/export_map.py`: arquivos georreferenciados do mapa interativo (`*_lst_pred`, `*_mask_inviavel`, `*_corredores.geojson`, `bounds.json`).
 
-## Resultados principais
+## Mapa interativo (página do projeto)
 
-| Métrica (validação cruzada por cidade, k = 5) | Valor |
+Página estática em `docs/`, publicada pelo GitHub Pages: **https://abraaolm-maker.github.io/arbormap/**
+
+- **Gestor:** mapa de calor dos 123 bairros de Teresina, escolha de praças e calçadas por número de árvores ou clicando no mapa, plano completo numa nova aba (mapa do trecho, áreas com coordenadas, bairros atendidos, espécies nativas), ranking de bairros por calor × vulnerabilidade e aba de confiabilidade.
+- **Cidadão** (`?modo=cidadao`): busca por bairro, faixa de resfriamento se o bairro for arborizado e passo a passo para cobrar a Prefeitura.
+- Os dados da página são gerados por `decision/export_pagina.py`; não há servidor.
+
+Para publicar num repositório próprio: copie o repositório, ative o GitHub Pages em *Settings → Pages → Deploy from a branch → main, pasta /docs*.
+
+## Resultados principais (modelo final v1.0.0, 20 épocas fixas)
+
+| Métrica (validação cruzada por cidade, k = 5, época fixa) | Valor |
 |---|---|
-| MAE médio em cidades inéditas | 3,64 ± 0,48 °C |
-| Hotspot MAE (percentil 90) | 2,75 ± 0,58 °C |
-| Redução média de LST em Teresina (4,05 ha) – ARBORMAP | 2,86 °C |
-| Idem – alocação gulosa | 1,51 °C |
-| Idem – alocação aleatória | 0,15 °C |
+| MAE médio em cidades inéditas | 2,04 ± 0,20 °C |
+| Hotspot MAE (percentil 90) | 2,62 ± 0,44 °C |
+| Boundary IoU | 0,230 ± 0,011 |
+| MAE em Teresina (composição seca, área ampliada, 123 bairros) | 1,29 °C (correlação 0,89) |
+| Comparação, mesma régua: regressão linear / média da cena | 2,36 / 2,68 °C |
+| Experimento natural (onde a vegetação aumentou, 2018–21 → 2023–24) | −1,00 °C medido × −1,06 °C previsto |
+| Parques existentes (38): frescor medido × previsto | 0,76 × 1,12 °C (correlação 0,94) |
+| Superfície × ar (INMET A312, 80 dias; seca) | superfície 8,2 °C acima do ar; r = 0,62 |
+
+Detalhes e histórico das correções: `ACHADOS` e o documento técnico enviados junto com o artigo (versão 4).
+
+## Módulos novos (outubro/2026)
+
+```
+src/arbormap/
+  model/train_urbanheatnet.py      treino final (CONFIG_FINAL: 20 épocas, máscara de LST ≤ 1 °C)
+  analysis/verify_urbanheatnet.py  verificação independente e referências simples
+  analysis/validacao_real.py       experimento natural, parques existentes e ablação
+  analysis/validacao_inmet.py      superfície (Landsat) × ar (INMET A312)
+  analysis/figuras_artigo_v4.py    figuras do artigo, versão 4
+  data/landsat_pc.py               composições Landsat do Planetary Computer (área ampliada)
+  decision/city_layers.py          composição seca, previsão por janelas e incerteza
+  decision/bairros.py              métricas por bairro (IBGE, Censo 2022)
+  decision/plantable.py            fração plantável por pixel (Overture + OpenStreetMap)
+  decision/areas_candidatas.py     praças e calçadas candidatas, efeito simulado de cada uma
+  decision/especies.py             espécies nativas (Manual de Fortaleza + Flora e Funga do Brasil)
+  decision/export_pagina.py        dados da página (docs/data)
+docs/                              página interativa (GitHub Pages)
+```
+
+Tags: `v1.0.0` (modelo final), `v1.1-completa` (página com orçamento, cenários e desenho livre, antes da simplificação).
 
 ## Histórico de versões
 
-- **v1 (abril/2026)** – U-Net ConvLSTM com sequências de 6 composições. Abandonada: revisita de 16 dias + descarte de nuvens gera séries irregulares; o calor urbano é governado por fatores quase estáticos; a abordagem agravava a regressão à média e sextuplicava memória e tempo de treino.
-- **v2 (intermediária)** – UrbanHeatNet com módulo ASPP e perda informada pela física.
-- **v3 (final)** – UrbanHeatNet híbrida com blocos residuais e portões de atenção, Group Normalization e perda híbrida. Resultados do artigo.
+- **ConvLSTM (abril/2026)** – U-Net ConvLSTM com 8 canais, incluindo a LST da cena anterior. Gerou a Tabela 2 e as Figuras 5 e 6 das versões 1 a 3 do artigo; abandonada pelos motivos descritos no artigo.
+- **ASPP (intermediária)** – UrbanHeatNet com módulo ASPP.
+- **UrbanHeatNet final (v1.0.0)** – blocos residuais, portões de atenção, Group Normalization, 4 canais (NDVI, NDBI, DEM, NDWI), sem LST de entrada; retreinada em outubro/2026 com os pixels de LST zerada fora do alvo e época fixa.
 
-## Próximos passos (até fevereiro de 2027)
+## Próximos passos
 
-- Validação das áreas recomendadas em Teresina com dados de temperatura do ar do INMET
-- Mapa interativo para gestores municipais e versão para cidadãos
+- Medição de campo em pontos escolhidos no mapa
+- Conferência das espécies com Machado et al. (2006) e com o viveiro municipal
 - Experimentação de perdas adversariais para reduzir a subestimação de extremos térmicos
-
 ## Citação
 
 Ver `CITATION.cff`.

@@ -5,7 +5,7 @@ body.plano { display: block; height: auto; background: var(--bg); }
 .plano-topo .sub { font-size: 12px; color: var(--muted); }
 .plano-topo .acoes { margin-left: auto; display: flex; gap: 8px; }
 .plano-topo a.btn { text-decoration: none; display: inline-block; }
-.plano-corpo { max-width: 1080px; margin: 0 auto; padding: 20px 24px 60px; }
+.plano-corpo { display: block; flex: none; max-width: 1080px; margin: 0 auto; padding: 20px 24px 60px; }
 .plano-corpo section { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; margin: 16px 0; break-inside: avoid-page; }
 .plano-corpo h2 { font-size: 17px; margin: 0 0 10px; }
 .plano-corpo h3 { margin-top: 16px; }
