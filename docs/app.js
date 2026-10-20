@@ -13,6 +13,7 @@ const PALETAS = {
 const TIPOS = { praca: "Praça/parque", calcada: "Calçada/canteiro", livre: "Área livre" };
 const COR_TIPO = { praca: "#1d8a45", calcada: "#2a6fbf", livre: "#c98a00" };
 const EQUIP = { escola: "escola", creche: "creche", saude: "unidade de saúde" };
+const EFEITO_MIN = 0.05;   // °C: abaixo disso o modelo não detecta resfriamento no próprio local
 const ESTRATEGIAS = { eficiencia: "Maior resfriamento por árvore", multicriterio: "Multicritério do modelo", quente: "Mais quentes primeiro" };
 const METRICAS = {
   indice: { nome: "Índice calor × vulnerabilidade", un: "", pal: "YlOrRd", dec: 0 },
@@ -111,6 +112,7 @@ const custoUnit = () => (S.custoArvore || 0) + (S.custoManut || 0);
 function areasFiltradas() {
   return S.areas.filter((f) => {
     const p = f.properties;
+    if (p.resfriamento_c < EFEITO_MIN) return false;   // sem resfriamento local detectável
     if (!S.tipos.has(p.tipo)) return false;
     if (S.bairro && p.bairro !== S.bairro) return false;
     if (S.filtroEquip && !(p.equipamento_proximo && p.equipamento_proximo.dist_m <= S.dist)) return false;
@@ -235,6 +237,7 @@ function popupArea(p) {
     Resfriamento integrado: ${fmt(p.resfriamento_int, 1)} °C·ha
     ${eq ? `<br>A ${fmt(eq.dist_m)} m de ${EQUIP[eq.categoria]}: ${esc(eq.nome)}` : ""}
     ${p.tipo === "livre" ? '<br><span class="warn">Área possivelmente privada: verificar.</span>' : ""}
+    ${p.resfriamento_c < EFEITO_MIN ? '<br><span class="warn">O modelo não detecta resfriamento no próprio local: fica fora das estratégias automáticas.</span>' : ""}
     ${S.modo === "gestor" ? `<br><button class="btn ${no ? "ghost" : ""}" style="margin-top:6px" onclick="alternarArea(${p.id})">${no ? "Retirar do plano" : "Incluir no plano"}</button>` : ""}`;
 }
 function ligarArea(f, l) {
@@ -522,7 +525,7 @@ function preencherConfiabilidade() {
   $("#limitacoes").innerHTML = [
     "A temperatura é a da superfície (chão, telhados, copas), medida por satélite às 10h da manhã, e não a temperatura do ar.",
     "O modelo prevê quanto cada ponto fica acima ou abaixo da média da própria cidade. Por isso o resfriamento simulado é local: mostra onde a arborização refresca, não quanto cai a média de Teresina. Na conta do modelo, o frescor de uma área aparece compensado por um aquecimento leve e espalhado pelo resto da cidade; isso vem da forma como o modelo foi treinado, não é um efeito físico, e por isso o resfriamento integrado (°C·ha) soma só o frescor.",
-    "Plantios muito esparsos (só uma faixa estreita de calçada em cada pixel de 30 m) mudam pouco o que o satélite vê; nesses casos o modelo pode não detectar efeito.",
+    `Plantios muito esparsos (só uma faixa estreita de calçada em cada pixel de 30 m) mudam pouco o que o satélite vê; nesses casos o modelo pode não detectar efeito. ${S.areas.filter((f) => f.properties.resfriamento_c < EFEITO_MIN).length} das ${S.areas.length} áreas candidatas ficaram abaixo de ${fmt(EFEITO_MIN, 2)} °C no próprio local e não entram nas estratégias automáticas.`,
     "A persistência (repetir o mês anterior) erra menos, mas precisa da temperatura medida; o modelo prevê só com vegetação, construções, água e relevo, o que permite simular cenários.",
     "O efeito vale para árvores adultas, com copa formada, o que leva de 5 a 10 anos.",
     m.validacao_real ? `Nos parques que já existem, o modelo previu mais frescor do que o satélite mede (${fmt(m.validacao_real.parques.pred_media_c, 2)} °C × ${fmt(m.validacao_real.parques.obs_media_c, 2)} °C em média): os valores simulados são um limite superior.` : null,
