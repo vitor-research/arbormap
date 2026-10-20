@@ -112,6 +112,10 @@ tr.sel { background: #fff5d6; }
 .big.hot { color: var(--hot); }
 .big.cool { color: var(--cool); }
 
+.ficha.impacto { background: var(--accent-soft); border-color: #cfe5d8; }
+.passos { padding-left: 20px; font-size: 13.5px; line-height: 1.5; }
+.passos li { margin: 0 0 12px; }
+.passos textarea { width: 100%; margin: 6px 0; font: inherit; font-size: 12.5px; padding: 8px; border: 1px solid var(--line); border-radius: 8px; resize: vertical; }
 .cidadao-hero { background: linear-gradient(135deg, #e9f5ee, #f6f7f4); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; }
 .leaflet-popup-content { font-size: 13px; line-height: 1.45; }
 .leaflet-popup-content b { color: var(--ink); }

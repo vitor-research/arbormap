@@ -415,6 +415,59 @@ function fichaBairro(cd) {
 }
 
 /* ---------------- cidadão ---------------- */
+/* Faixa de resfriamento se o bairro receber árvores em todas as praças e calçadas indicadas.
+   Teto: o resfriamento que o modelo prevê no local que mais se beneficia.
+   Piso: o teto corrigido pelo que o satélite mediu nos parques que já existem
+   (frescor medido ÷ previsto pelo modelo), a correção conservadora calibrada no mundo real.
+   No ar: relação superfície → ar medida na estação do INMET na estação seca (estimativa grosseira). */
+function faixaBairro(nome) {
+  const areas = S.areas.filter((f) => f.properties.bairro === nome && f.properties.resfriamento_c >= EFEITO_MIN);
+  if (!areas.length) return null;
+  const pq = S.meta.validacao_real?.parques, inm = S.meta.validacao_inmet;
+  const correcao = pq ? Math.min(1, pq.obs_media_c / pq.pred_media_c) : 1;
+  const teto = Math.max(...areas.map((f) => f.properties.resfriamento_c));
+  const razao = areas.length > 1 ? Math.min(S.meta.areas?.aditividade?.razao_conjunto_soma ?? 1, 1) : 1;
+  const ha05 = areas.reduce((s, f) => s + f.properties.area_05c_ha, 0) * razao;
+  const ar = inm?.seca?.inclinacao_ar_por_grau_lst;
+  const melhores = areas.slice().sort((a, b) => b.properties.resfriamento_c - a.properties.resfriamento_c).slice(0, 3);
+  return { n: areas.length, arvores: areas.reduce((s, f) => s + arvoresDe(f.properties), 0), piso: teto * correcao, teto, correcao,
+           ha05, arPiso: ar ? teto * correcao * ar : null, arTeto: ar ? teto * ar : null, melhores,
+           pracas: areas.filter((f) => f.properties.tipo === "praca").length, calcadas: areas.filter((f) => f.properties.tipo === "calcada").length };
+}
+function linkPlanoBairro(nome, fx) {
+  const h = new URLSearchParams({ e: "eficiencia", n: fx.arvores, t: "praca,calcada", b: nome });
+  return location.origin + location.pathname + "#" + h.toString();
+}
+function mensagemCobranca(p, fx, link) {
+  const calor = p.anomalia_c == null ? "" : p.anomalia_c >= 0
+    ? `a superfície do bairro fica ${fmt(p.anomalia_c, 1)} °C acima da média da cidade na estação seca, e só ${fmt(p.vegetacao_densa_pct)}% do bairro tem vegetação densa. `
+    : `a superfície do bairro fica ${fmt(-p.anomalia_c, 1)} °C abaixo da média da cidade na estação seca, e ${fmt(p.vegetacao_densa_pct)}% do bairro tem vegetação densa. `;
+  const efeito = fx
+    ? `O mapa indica ${fx.n} praças e calçadas públicas do bairro onde o plantio de árvores pode reduzir a temperatura da superfície em ${fmt(fx.piso, 1)} a ${fmt(fx.teto, 1)} °C nos pontos que mais se beneficiam.\n\n` +
+      `Solicito que a Prefeitura informe se há plano de arborização para o bairro ${p.bairro} e inclua essas áreas no planejamento, com prazo e espécies nativas adequadas.\n\n`
+    : `\n\nSolicito que a Prefeitura informe se há plano de arborização para o bairro ${p.bairro} e quais praças e ruas podem receber árvores, com prazo e espécies nativas adequadas.\n\n`;
+  return `Prezados(as),\n\nSou morador(a) do bairro ${p.bairro}, em Teresina. Segundo o ARBORMAP (mapa de ilhas de calor feito com imagens de satélite), ` +
+    calor + efeito + `Mapa: ${link}\n\nAtenciosamente,`;
+}
+function blocoCobrar(p, fx) {
+  const link = fx ? linkPlanoBairro(p.bairro, fx) : location.origin + location.pathname + "?modo=cidadao";
+  const msg = mensagemCobranca(p, fx, link);
+  return `<div class="ficha">
+    <h2>Quer árvores no seu bairro? Cobre do poder público</h2>
+    <p>Arborizar praças e calçadas é responsabilidade da Prefeitura, e a população tem canais oficiais para pedir. Quanto mais pessoas pedirem, com dados, maior a chance de o bairro entrar no planejamento.</p>
+    <ol class="passos">
+      <li><b>Copie a mensagem pronta</b>, com os dados do seu bairro e o link do mapa.
+        <textarea id="c-msg" readonly rows="7">${esc(msg)}</textarea>
+        <button class="btn" id="c-copiar">Copiar mensagem</button> <span class="small" id="c-copiado"></span></li>
+      <li><b>Registre na Ouvidoria da Prefeitura</b> (<a href="https://ouvidoria.teresina.pi.gov.br/" target="_blank" rel="noopener">ouvidoria.teresina.pi.gov.br</a>), como solicitação ou sugestão, colando a mensagem. Guarde o número do protocolo.</li>
+      <li><b>Peça informação oficial pelo e-SIC</b> (<a href="https://esic.teresina.pi.gov.br/" target="_blank" rel="noopener">esic.teresina.pi.gov.br</a>): pergunte se existe plano de arborização para o bairro ${esc(p.bairro)} e quais praças e ruas estão previstas. Pela Lei de Acesso à Informação (Lei nº 12.527/2011), a resposta deve vir em até 20 dias, prorrogáveis por mais 10; se não vier, você pode recorrer no próprio sistema.</li>
+      <li><b>Procure um vereador</b> (<a href="https://www.teresina.pi.leg.br/vereadores" target="_blank" rel="noopener">lista na Câmara Municipal</a>) e peça que apresente uma indicação à Prefeitura pedindo a arborização dessas áreas. Dá para acompanhar no <a href="https://teresina.camarasempapel.com.br/" target="_blank" rel="noopener">Processo Legislativo Eletrônico</a> da Câmara.</li>
+      <li><b>Junte os vizinhos</b>: leve o mapa à associação de moradores, à escola e à unidade de saúde do bairro. A Lei de Responsabilidade Fiscal prevê audiências públicas na elaboração do orçamento do município: é o momento de pedir que a arborização entre no orçamento.</li>
+      <li><b>Acompanhe</b>: volte à Ouvidoria e ao e-SIC com o número do protocolo e repita o pedido se não houver resposta.</li>
+    </ol>
+  </div>`;
+}
+
 function mostrarCidadao(cd) {
   const p = bairroPorCd(cd).properties;
   $("#c-busca").value = p.bairro;
@@ -431,6 +484,33 @@ function mostrarCidadao(cd) {
     <p>${frase}</p>
     ${p.tem ? `<p>${fmt(p.vegetacao_densa_pct)}% do bairro tem vegetação densa${p.hotspot_pct > 0 ? ` e ${fmt(p.hotspot_pct)}% está entre os pontos mais quentes da cidade` : ""}.</p>` : ""}
     ${areas.length ? `<p>O mapa indica <b>${areas.length}</b> ${areas.length > 1 ? "lugares públicos" : "lugar público"} (praças e calçadas) onde plantar árvores pode deixar o entorno mais fresco. Eles aparecem em verde no mapa.</p>` : ""}</div>`;
+  const fx = faixaBairro(p.bairro);
+  if (!fx) {
+    $("#c-resultado").insertAdjacentHTML("beforeend", `<div class="ficha"><p>O mapa não encontrou praças ou calçadas públicas neste bairro com espaço livre suficiente para um efeito que o satélite consiga medir. Ainda assim, vale pedir à Prefeitura um levantamento de onde plantar.</p></div>` + blocoCobrar(p, null));
+    ligarCopiar();
+    return;
+  }
+  const lugares = fx.melhores.map((f) => {
+    const q = f.properties, [lon, lat] = q.centro || [null, null];
+    return `<li>${q.tipo === "praca" ? "Praça/parque" : "Calçada/canteiro"}${q.equipamento_proximo && q.equipamento_proximo.dist_m <= 300 ? ` perto de ${esc(q.equipamento_proximo.nome)}` : ""}: até ${fmt(q.resfriamento_c, 1)} °C
+      ${lat != null ? ` · <a href="https://www.google.com/maps?q=${lat.toFixed(6)},${lon.toFixed(6)}" target="_blank" rel="noopener">ver no mapa</a>` : ""}</li>`;
+  }).join("");
+  $("#c-resultado").insertAdjacentHTML("beforeend", `<div class="ficha impacto">
+    <h2>Se o bairro for arborizado</h2>
+    <p class="small">Plantando árvores nas ${fx.n} áreas indicadas (${fx.pracas} praças e ${fx.calcadas} trechos de calçada, cerca de ${fmt(fx.arvores)} árvores), quando as copas estiverem adultas:</p>
+    <div class="big cool">${fmt(fx.piso, 1)} a ${fmt(fx.teto, 1)} °C</div>
+    <p>a menos na temperatura do chão e das calçadas, nos pontos que mais se beneficiam. Cerca de <b>${fmt(fx.ha05, 0)} ha</b> do bairro e do entorno ficariam ao menos 0,5 °C mais frescos.</p>
+    ${fx.arTeto != null ? `<p class="small">No ar que se respira, o efeito é menor: algo em torno de ${fmt(fx.arPiso, 2)} a ${fmt(fx.arTeto, 2)} °C, pela relação entre superfície e ar medida na estação do INMET em Teresina (estimativa aproximada).</p>` : ""}
+    <h3>Onde o efeito é maior</h3><ul class="small">${lugares}</ul>
+    <p class="small">Como o cálculo foi feito: o maior valor é o que o modelo prevê para o lugar que mais refresca; o menor aplica a correção medida nos parques que já existem em Teresina, onde o frescor real foi ${fmt(fx.correcao * 100)}% do previsto. São valores para árvores adultas, na temperatura da superfície medida por satélite.</p>
+  </div>` + blocoCobrar(p, fx));
+  ligarCopiar();
+}
+function ligarCopiar() {
+  $("#c-copiar").onclick = () => {
+    const t = $("#c-msg"); t.select();
+    navigator.clipboard?.writeText(t.value).then(() => ($("#c-copiado").textContent = "Mensagem copiada."), () => { document.execCommand("copy"); $("#c-copiado").textContent = "Mensagem copiada."; });
+  };
 }
 
 /* ---------------- confiabilidade e sobre ---------------- */
