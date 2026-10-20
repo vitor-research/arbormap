@@ -78,14 +78,16 @@ def fold_of_city(fold_results, city):
     raise ValueError(f"{city} não está na validação de nenhum fold.")
 
 
-def load_scene(data_dir, city, valid_files_set, stats, pair_index=-1):
-    """Carrega um par (cena base, cena alvo) exatamente como o dataset de validação.
+def load_scene(data_dir, city, valid_files_set, stats, pair_index=-1, lst_min_valida=None):
+    """Carrega um par (cena base, cena alvo) exatamente como o dataset de validação do treino.
 
     Devolve o tensor de entrada normalizado, o alvo, a máscara válida, as bandas brutas
     recortadas da cena base, a LST observada da cena alvo e os metadados do recorte.
+    lst_min_valida deve ser o mesmo do treino (gravado no checkpoint).
     """
-    ds = UrbanHeatDataset(data_dir, allowed_cities=[city], valid_files_set=valid_files_set,
-                          normalize=True, stats=stats, is_train=False)
+    from arbormap.model.train_urbanheatnet import UrbanHeatDatasetMasked
+    ds = UrbanHeatDatasetMasked(data_dir, allowed_cities=[city], valid_files_set=valid_files_set,
+                                normalize=True, stats=stats, is_train=False, lst_min_valida=lst_min_valida)
     if len(ds) == 0:
         raise RuntimeError(f"Nenhum par válido para {city}.")
     idx = pair_index % len(ds)
@@ -107,8 +109,12 @@ def load_scene(data_dir, city, valid_files_set, stats, pair_index=-1):
     # Pixels com LST <= 1 °C são lacunas de nuvem gravadas como 0 no download, não temperatura
     lst_obs[lst_obs <= 1.0] = np.nan
 
-    valid_np = valid[0].numpy().astype(bool)
+    valid_np = valid[0].numpy().astype(bool) & np.isfinite(lst_obs)
     macro = float(np.nanmean(lst_obs[valid_np]))
+    # Para predição, plantio e mapa vale a área com entrada válida (todo o recorte),
+    # inclusive onde a LST observada foi perdida para nuvem.
+    valid = torch.zeros_like(valid)
+    valid[0, :hh, :ww] = 1.0
     meta = {"cidade": city, "arquivo_base": Path(base_file).name, "arquivo_alvo": Path(target_file).name,
             "par_indice": idx, "n_pares": len(ds), "shape_original": [int(h), int(w)],
             "recorte_y0_x0": [int(y0), int(x0)], "recorte_h_w": [int(hh), int(ww)],
@@ -310,7 +316,8 @@ def run_city(model, ckpt_state, data_dir, valid_files_set, city="Teresina", pair
     device = device or next(model.parameters()).device
     stats = (np.asarray(ckpt_state["mean"]), np.asarray(ckpt_state["std"]))
 
-    x, tgt_z, valid_t, raw, lst_obs, std_ref, mean_ref, meta = load_scene(data_dir, city, valid_files_set, stats, pair_index)
+    x, tgt_z, valid_t, raw, lst_obs, std_ref, mean_ref, meta = load_scene(
+        data_dir, city, valid_files_set, stats, pair_index, lst_min_valida=ckpt_state.get("lst_min_valida"))
     x = x.to(device)
     valid = valid_t[0, 0].numpy().astype(bool)
     lst_base = predict_celsius(model, x, std_ref, mean_ref)

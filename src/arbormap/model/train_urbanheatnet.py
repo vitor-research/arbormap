@@ -25,12 +25,73 @@ import torch
 from torch.utils.data import DataLoader
 
 from arbormap.model.hybrid_pipeline import (
+    CH_LST,
     HybridPhysicsLoss,
     HybridUrbanHeatNet,
     UrbanHeatDataset,
     compute_metrics,
     filter_cloudy_files_runtime,
 )
+
+
+class UrbanHeatDatasetMasked(UrbanHeatDataset):
+    """UrbanHeatDataset (célula 32) que exclui do alvo os pixels sem dado de LST.
+
+    O download grava como 0 °C os pixels mascarados por nuvem (cerca de 2,4% de cada cena).
+    Aqui, pixels do alvo com LST <= lst_min_valida saem da máscara válida antes do cálculo
+    da média e do desvio-padrão da cena; ficam, portanto, fora da perda e das métricas.
+    Com lst_min_valida=None, o comportamento é idêntico ao da classe original.
+    """
+
+    def __init__(self, *args, lst_min_valida=1.0, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.lst_min_valida = lst_min_valida
+
+    def __getitem__(self, idx):
+        if self.lst_min_valida is None:
+            return super().__getitem__(idx)
+        state = random.getstate()
+        out_seq, out_tgt, out_valid, _ = super().__getitem__(idx)
+        # Repete o mesmo recorte e as mesmas transformações do item original para obter
+        # a LST bruta do alvo alinhada com out_tgt.
+        random.setstate(state)
+        raw = self._raw_target(idx)
+        base_ok = out_valid[0] > 0
+        good = base_ok & (raw > self.lst_min_valida)
+        if good.sum() < 2:
+            return out_seq, out_tgt * 0, good.float().unsqueeze(0), torch.tensor(1.0)
+        vals = raw[good]
+        macro, sd = vals.mean(), vals.std() + 1e-6
+        tgt = ((raw - macro) / sd) * good.float()
+        return out_seq, tgt.unsqueeze(0).float(), good.float().unsqueeze(0), sd.clone().detach().float()
+
+    def _raw_target(self, idx):
+        """LST bruta do alvo com o mesmo recorte e aumento de dados de super().__getitem__."""
+        from arbormap.model.hybrid_pipeline import CHANNELS_TO_KEEP, LST_CLIP_MAX, LST_CLIP_MIN, ensure_channels_first
+        base_file, target_file = self.samples[idx]
+        base_img = ensure_channels_first(np.load(base_file).astype(np.float32))[CHANNELS_TO_KEEP]
+        tgt_img = ensure_channels_first(np.load(target_file).astype(np.float32))[CHANNELS_TO_KEEP]
+        max_h = min(base_img.shape[1], tgt_img.shape[1])
+        max_w = min(base_img.shape[2], tgt_img.shape[2])
+        crop = 400
+        if self.is_train and max_h > crop and max_w > crop:
+            y = random.randint(0, max_h - crop)
+            x = random.randint(0, max_w - crop)
+        else:
+            y, x = max(0, (max_h - crop) // 2), max(0, (max_w - crop) // 2)
+        c = tgt_img[CH_LST, y:y + crop, x:x + crop]
+        raw = np.zeros((crop, crop), dtype=np.float32)
+        raw[:c.shape[0], :c.shape[1]] = c
+        raw = torch.from_numpy(np.clip(raw, LST_CLIP_MIN, LST_CLIP_MAX))
+        if self.is_train:
+            if random.random() > 0.5:
+                raw = torch.flip(raw, dims=[-1])
+            if random.random() > 0.5:
+                raw = torch.flip(raw, dims=[-2])
+            k = random.randint(0, 3)
+            if k > 0:
+                raw = torch.rot90(raw, k, dims=[-2, -1])
+        return raw
 
 # ============================================================
 # FOLDS (Tabela 1 do artigo: IDs 01-04, 05-08, 09-12, 13-16, 17-20)
@@ -56,7 +117,12 @@ CONFIG_PADRAO = {
     "hotspot_w": 0.1,
     "temp_threshold": 15.0,
     "min_cloud_pct": 30.0,
+    "lst_min_valida": None,   # None = alvo como na célula 32; 1.0 = exclui pixels de LST zerada
 }
+
+# Configuração do retreino v2: hiperparâmetros que o artigo descreve (Seção III-D)
+# e exclusão dos pixels de LST zerada (lacunas de nuvem) do alvo.
+CONFIG_V2 = {"epochs": 40, "lr": 1e-4, "weight_decay": 0.05, "lst_min_valida": 1.0}
 
 
 class _Tee:
@@ -95,11 +161,12 @@ def _train_fold(fold, val_cities, train_cities, data_dir, valid_files_set, out_d
     ckpt_last = out_dir / f"last_fold_{fold}.pt"
 
     _seed_all(cfg["seed"] + fold)
-    train_ds = UrbanHeatDataset(data_dir, allowed_cities=train_cities, valid_files_set=valid_files_set,
-                                normalize=True, stats=None, is_train=True)
+    lmin = cfg.get("lst_min_valida")
+    train_ds = UrbanHeatDatasetMasked(data_dir, allowed_cities=train_cities, valid_files_set=valid_files_set,
+                                      normalize=True, stats=None, is_train=True, lst_min_valida=lmin)
     stats = (train_ds.mean, train_ds.std)
-    val_ds = UrbanHeatDataset(data_dir, allowed_cities=val_cities, valid_files_set=valid_files_set,
-                              normalize=True, stats=stats, is_train=False)
+    val_ds = UrbanHeatDatasetMasked(data_dir, allowed_cities=val_cities, valid_files_set=valid_files_set,
+                                    normalize=True, stats=stats, is_train=False, lst_min_valida=lmin)
     print(f"   pares de treino: {len(train_ds)} | pares de validação: {len(val_ds)}")
     if len(train_ds) == 0 or len(val_ds) == 0:
         raise RuntimeError(f"Fold {fold + 1} sem dados de treino ou validação.")
@@ -179,7 +246,8 @@ def _train_fold(fold, val_cities, train_cities, data_dir, valid_files_set, out_d
             best_loss = row["val_loss"]
             torch.save({"state_dict": model.state_dict(), "mean": stats[0], "std": stats[1],
                         "fold": fold, "epoch": row["epoch"], "val_cities": val_cities,
-                        "train_cities": train_cities, "base_c": cfg["base_c"]}, ckpt_best)
+                        "train_cities": train_cities, "base_c": cfg["base_c"],
+                        "lst_min_valida": lmin}, ckpt_best)
 
         torch.save({"model": model.state_dict(), "optimizer": optimizer.state_dict(),
                     "scheduler": scheduler.state_dict(), "history": history,
