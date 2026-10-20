@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARBORMAP Teresina</title>
+<meta name="description" content="Mapa interativo de ilhas de calor e planejamento de arborização urbana em Teresina (PI), baseado no modelo UrbanHeatNet.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>ARBOR<span>MAP</span> · Teresina</h1>
+    <div class="sub">Ilhas de calor previstas por satélite e simulação de arborização</div>
+  </div>
+  <div class="modes" role="tablist">
+    <button id="modo-gestor" class="on">Gestor</button>
+    <button id="modo-cidadao">Cidadão</button>
+  </div>
+</header>
+<main>
+  <div id="map" aria-label="Mapa de Teresina"></div>
+  <aside>
+    <nav class="tabs" id="tabs">
+      <button data-tab="planejar" class="on">Planejar</button>
+      <button data-tab="bairros">Bairros</button>
+      <button data-tab="confiavel">Confiabilidade</button>
+      <button data-tab="sobre">Sobre</button>
+    </nav>
+
+    <!-- PLANEJAR -->
+    <section class="panel on" id="tab-planejar">
+      <h2>Quanto arborizar?</h2>
+      <div class="row">
+        <select id="orc-unidade" class="fix" style="width:120px">
+          <option value="arvores">Árvores</option>
+          <option value="ha">Hectares</option>
+          <option value="reais">R$</option>
+        </select>
+        <input type="number" id="orc-valor" min="0" step="1">
+      </div>
+      <input type="range" id="orc-slider" min="0" max="100" step="1">
+      <div id="orc-aviso" class="note warn" hidden></div>
+
+      <details id="premissas">
+        <summary>Custos e premissas</summary>
+        <div class="row"><label>Muda + plantio por árvore (R$)</label><input type="number" id="custo-arvore" min="0" step="1" placeholder="informar"></div>
+        <div class="row"><label>Manutenção por árvore, 2 a 3 anos (R$)</label><input type="number" id="custo-manut" min="0" step="1" placeholder="informar"></div>
+        <div class="row"><label>Área por árvore (m²)</label><input type="number" id="m2-arvore" min="4" step="1" value="36"></div>
+        <p class="small">Os custos devem vir de fonte oficial (ata de registro de preços da Prefeitura ou SINAPI-PI). A área por árvore é uma premissa ajustável (36 m² ≈ espaçamento de 6 × 6 m).</p>
+      </details>
+
+      <h3>Estratégia de escolha</h3>
+      <div class="radios" id="estrategia">
+        <label><input type="radio" name="estr" value="eficiencia" checked><span>Maior resfriamento por árvore<small>áreas em que cada árvore produz mais frescor</small></span></label>
+        <label><input type="radio" name="estr" value="multicriterio"><span>Multicritério do modelo<small>potencial de resfriamento estimado pela rede + calor do local</small></span></label>
+        <label><input type="radio" name="estr" value="quente"><span>Mais quentes primeiro<small>prioriza as áreas de maior temperatura</small></span></label>
+        <label><input type="radio" name="estr" value="manual"><span>Seleção manual<small>clique nas áreas do mapa para incluir ou retirar</small></span></label>
+      </div>
+
+      <h3>Filtros</h3>
+      <div class="checks">
+        <label><input type="checkbox" class="f-tipo" value="praca" checked> <span class="pill praca">Praças e parques</span></label>
+        <label><input type="checkbox" class="f-tipo" value="calcada" checked> <span class="pill calcada">Calçadas e canteiros</span></label>
+        <label><input type="checkbox" class="f-tipo" value="livre"> <span class="pill livre">Áreas livres (a verificar)</span></label>
+      </div>
+      <div class="row"><select id="f-bairro"><option value="">Todos os bairros</option></select></div>
+      <div class="checks">
+        <label><input type="checkbox" id="f-equip"> Até <input type="number" id="f-dist" value="300" min="50" step="50" style="width:70px"> m de escola, creche ou unidade de saúde</label>
+        <label><input type="checkbox" id="f-incerteza"> Só onde o modelo tem baixa incerteza (&lt; 0,5 °C)</label>
+      </div>
+
+      <h2>Resultado do plano</h2>
+      <div class="cards" id="cards"></div>
+      <p class="small" id="resumo-nota"></p>
+      <div class="chartbox"><canvas id="chart-curva"></canvas></div>
+      <p class="small">Resfriamento integrado acumulado (°C·ha) conforme o número de árvores, para cada estratégia. A linha vertical marca o plano atual.</p>
+      <div class="row"><button class="btn ghost fix" id="btn-link">Copiar link do plano</button><span class="small" id="link-ok"></span></div>
+
+      <h3>Áreas do plano</h3>
+      <div class="tablewrap"><table id="tab-areas"><thead><tr><th>#</th><th>Tipo</th><th>Bairro</th><th class="num">Árvores</th><th class="num">ΔT</th><th>Perto de</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <!-- BAIRROS -->
+    <section class="panel" id="tab-bairros">
+      <h2>Prioridade por bairro</h2>
+      <div class="row"><label>Colorir o mapa por</label>
+        <select id="b-metrica">
+          <option value="indice">Índice calor × vulnerabilidade</option>
+          <option value="anomalia_c">Temperatura acima da média (°C)</option>
+          <option value="hotspot_pct">Área em ilha de calor (%)</option>
+          <option value="vuln_dens">Pessoas vulneráveis por km²</option>
+          <option value="vegetacao_densa_pct">Vegetação densa (%)</option>
+        </select>
+      </div>
+      <div id="peso-box">
+        <div class="row"><label>Peso do calor no índice: <b id="peso-lbl">60%</b></label></div>
+        <input type="range" id="peso-calor" min="0" max="100" step="5" value="60">
+        <p class="small">Índice de 0 a 100: combina a posição do bairro em calor (anomalia de temperatura) e em vulnerabilidade (crianças de 0 a 4 anos e pessoas com 60 anos ou mais, por km²).</p>
+      </div>
+      <div id="ficha"></div>
+      <div class="tablewrap"><table id="tab-bairros-t"><thead><tr>
+        <th data-k="bairro">Bairro</th><th data-k="indice" class="num">Índice</th><th data-k="anomalia_c" class="num">°C</th>
+        <th data-k="hotspot_pct" class="num">Ilha %</th><th data-k="vuln_dens" class="num">Vuln./km²</th><th data-k="vegetacao_densa_pct" class="num">Veg. %</th>
+      </tr></thead><tbody></tbody></table></div>
+      <p class="small" id="b-cobertura"></p>
+    </section>
+
+    <!-- CONFIABILIDADE -->
+    <section class="panel" id="tab-confiavel">
+      <h2>O modelo é confiável?</h2>
+      <div class="cards" id="conf-cards"></div>
+      <div class="chartbox"><canvas id="chart-ref"></canvas></div>
+      <p class="small">Erro médio (MAE, °C) da anomalia de temperatura em cidades que o modelo não viu no treino, na mesma régua para todos os métodos. Quanto menor, melhor. A persistência usa a temperatura do mês anterior como entrada e serve só de referência.</p>
+      <h3>Validação cruzada por cidade (época fixa, sem escolha pela validação)</h3>
+      <table id="tab-folds"><thead><tr><th>Fold</th><th>Cidades de validação</th><th class="num">MAE</th><th class="num">Ilha</th><th class="num">IoU</th></tr></thead><tbody></tbody></table>
+      <h3>Limitações, em linguagem simples</h3>
+      <ul id="limitacoes" class="small"></ul>
+    </section>
+
+    <!-- SOBRE -->
+    <section class="panel" id="tab-sobre">
+      <h2>Como ler este mapa</h2>
+      <p>O ARBORMAP usa imagens do satélite Landsat (30 m) e uma rede neural, a UrbanHeatNet, para prever onde a superfície da cidade fica mais quente, a partir da vegetação, das construções, da água e do relevo. Depois simula o efeito de arborizar cada área.</p>
+      <p>As cores do mapa mostram quanto cada ponto fica acima (vermelho) ou abaixo (azul) da temperatura média da superfície de Teresina na estação seca (junho a outubro).</p>
+      <p>O resfriamento simulado é <b>local</b> e vale para as árvores já crescidas, com copas formadas, o que leva de 5 a 10 anos.</p>
+      <h3>Fontes</h3>
+      <ul id="fontes" class="small"></ul>
+      <h3>Premissas</h3>
+      <ul id="premissas-lista" class="small"></ul>
+      <p class="small">Código e dados: <a href="https://github.com/abraaolm-maker/arbormap" target="_blank" rel="noopener">github.com/abraaolm-maker/arbormap</a></p>
+    </section>
+
+    <!-- CIDADÃO -->
+    <section class="panel" id="tab-cidadao">
+      <div class="cidadao-hero">
+        <h2>Seu bairro é uma ilha de calor?</h2>
+        <input type="search" id="c-busca" list="c-lista" placeholder="Digite o nome do bairro">
+        <datalist id="c-lista"></datalist>
+      </div>
+      <div id="c-resultado"></div>
+      <h3>O que é uma ilha de calor?</h3>
+      <p>Asfalto, telhados e concreto absorvem o sol e esquentam muito mais que áreas com árvores. Por isso, bairros com pouca vegetação ficam vários graus mais quentes que o resto da cidade.</p>
+      <p>As árvores fazem sombra e liberam umidade pelas folhas, o que deixa as ruas e calçadas mais frescas. Em Teresina, onde o calor passa de 40 °C na estação seca, isso faz diferença para a saúde de crianças e idosos.</p>
+      <p class="small">As temperaturas são da superfície (chão e telhados), medidas por satélite, e não a temperatura do ar.</p>
+    </section>
+  </aside>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="app.js?v=2"></script>
+</body>
+</html>

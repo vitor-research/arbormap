@@ -1,0 +1,231 @@
+{
+ "cidade": "Teresina",
+ "bounds_leaflet": [
+  [
+   -5.133987957561347,
+   -42.8441101129482
+  ],
+  [
+   -5.026012042438653,
+   -42.73615976292685
+  ]
+ ],
+ "camadas": {
+  "anomalia": {
+   "arquivo": "teresina_anomalia.png",
+   "min": -8.0,
+   "max": 8.0,
+   "cmap": "RdYlBu_r",
+   "unidade": "°C"
+  },
+  "incerteza": {
+   "arquivo": "teresina_incerteza.png",
+   "min": 0,
+   "max": 1.1,
+   "cmap": "magma_r",
+   "unidade": "°C"
+  },
+  "plantavel": {
+   "arquivo": "teresina_plantavel.png",
+   "min": 0,
+   "max": 1,
+   "cmap": "YlGn",
+   "unidade": "fração"
+  },
+  "inviavel": {
+   "arquivo": "teresina_inviavel.png"
+  }
+ },
+ "lst_media_cidade_c": 38.32,
+ "composicao": {
+  "cenas": [
+   "2018_06.npy",
+   "2018_08.npy",
+   "2020_07.npy",
+   "2020_08.npy",
+   "2021_07.npy",
+   "2022_06.npy",
+   "2022_07.npy",
+   "2022_08.npy",
+   "2023_06.npy",
+   "2023_07.npy",
+   "2023_09.npy",
+   "2024_06.npy",
+   "2024_07.npy"
+  ],
+  "meses": [
+   6,
+   7,
+   8,
+   9,
+   10
+  ],
+  "mae_c": 1.01,
+  "pearson": 0.914,
+  "incerteza_media_c": 0.32,
+  "modelo": "best_hybrid_fold_0.pt",
+  "fold": 1,
+  "val_cities": [
+   "Iguatu_CE",
+   "Parnaiba",
+   "Pedro_II",
+   "Teresina"
+  ]
+ },
+ "modelo": {
+  "versao": "v1.0.0",
+  "folds": [
+   {
+    "fold": 1,
+    "val_cities": [
+     "Iguatu_CE",
+     "Parnaiba",
+     "Pedro_II",
+     "Teresina"
+    ],
+    "mae_c": 2.34,
+    "hotspot_mae_c": 3.34,
+    "iou": 0.226
+   },
+   {
+    "fold": 2,
+    "val_cities": [
+     "Juazeiro_do_Norte_CE",
+     "Floriano",
+     "Sao_Raimundo_Nonato",
+     "Picos"
+    ],
+    "mae_c": 1.88,
+    "hotspot_mae_c": 2.26,
+    "iou": 0.227
+   },
+   {
+    "fold": 3,
+    "val_cities": [
+     "Barreiras_BA",
+     "Imperatriz_MA",
+     "Patos_PB",
+     "Crato_CE"
+    ],
+    "mae_c": 2.01,
+    "hotspot_mae_c": 2.68,
+    "iou": 0.215
+   },
+   {
+    "fold": 4,
+    "val_cities": [
+     "Mossoro_RN",
+     "Bom_Jesus",
+     "Urucui",
+     "Araguaina_TO"
+    ],
+    "mae_c": 1.85,
+    "hotspot_mae_c": 2.27,
+    "iou": 0.24
+   },
+   {
+    "fold": 5,
+    "val_cities": [
+     "Sobral_CE",
+     "Corrente",
+     "Vitoria_da_Conquista_BA",
+     "Paulo_Afonso_BA"
+    ],
+    "mae_c": 2.09,
+    "hotspot_mae_c": 2.52,
+    "iou": 0.241
+   }
+  ],
+  "resumo": {
+   "val_loss": {
+    "media": 0.468,
+    "dp": 0.019
+   },
+   "mae_c": {
+    "media": 2.036,
+    "dp": 0.195
+   },
+   "hotspot_mae_c": {
+    "media": 2.617,
+    "dp": 0.444
+   },
+   "iou": {
+    "media": 0.23,
+    "dp": 0.011
+   }
+  }
+ },
+ "verificacao": {
+  "final": {
+   "oraculo": [
+    2.026,
+    0.193
+   ],
+   "realista": [
+    4.864,
+    0.308
+   ],
+   "media_cena": [
+    2.683,
+    0.336
+   ],
+   "linear_oraculo": [
+    2.361,
+    0.243
+   ],
+   "persistencia": [
+    1.594,
+    0.089
+   ],
+   "pearson_anomalia": [
+    0.675,
+    0.022
+   ]
+  }
+ },
+ "bairros": {
+  "lst_p90_c": 41.8,
+  "n_bairros": 123,
+  "n_com_metricas": 89,
+  "cobertura_minima": 0.3,
+  "bounds": [
+   -42.8441101129482,
+   -5.133987957561347,
+   -42.73615976292685,
+   -5.026012042438653
+  ],
+  "fontes": [
+   "IBGE, Censo 2022: malha de bairros e setores com atributos",
+   "IBGE, Censo 2022: agregados por setor, demografia (V01031, V01040, V01041)"
+  ]
+ },
+ "areas": {
+  "aditividade": {
+   "n_areas": 20,
+   "integral_conjunto": 724.46,
+   "soma_individuais": 909.41,
+   "razao_conjunto_soma": 0.797
+  },
+  "assinatura_vegetacao": {
+   "0": 0.7210023403167725,
+   "2": -0.22303733229637146,
+   "1": -0.6923365592956543
+  },
+  "n_areas": 355
+ },
+ "premissas": {
+  "largura_pista_m": "por tipo de via do OpenStreetMap (residencial 7 m, terciária 10 m, secundária 12 m, primária 14 m)",
+  "faixa_calcada_m": 2.5,
+  "ndvi_ja_vegetado": 0.3,
+  "agua_ndwi_min": 0.1,
+  "declividade_max_graus": 15,
+  "resolucao_m": 30
+ },
+ "fontes": [
+  "Landsat 8/9 (USGS), via Google Earth Engine: LST, NDVI, NDBI, NDWI; SRTM: DEM",
+  "Modelo: UrbanHeatNet (ARBORMAP v1.0.0), validação cruzada por cidade",
+  "IBGE, Censo 2022: bairros, setores e demografia",
+  "Overture Maps (Google Open Buildings, OpenStreetMap, Microsoft): contornos de prédios",
+  "OpenStreetMap: vias, praças e parques, escolas, creches e unidades de saúde"
+ ]
+}
