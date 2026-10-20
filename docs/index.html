@@ -6,13 +6,13 @@
 <title>ARBORMAP Teresina</title>
 <meta name="description" content="Mapa interativo de ilhas de calor e planejamento de arborização urbana em Teresina (PI), baseado no modelo UrbanHeatNet.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
 <header>
   <div class="brand">
     <h1>ARBOR<span>MAP</span> · Teresina</h1>
-    <div class="sub">Ilhas de calor previstas por satélite e simulação de arborização</div>
+    <div class="sub">Onde a cidade é mais quente, quem mora lá e onde plantar árvores refresca mais</div>
   </div>
   <div class="modes" role="tablist">
     <button id="modo-gestor" class="on">Gestor</button>
@@ -36,33 +36,15 @@
         <select id="orc-unidade" class="fix" style="width:120px">
           <option value="arvores">Árvores</option>
           <option value="ha">Hectares</option>
-          <option value="reais">R$</option>
         </select>
         <input type="number" id="orc-valor" min="0" step="1">
       </div>
       <input type="range" id="orc-slider" min="0" max="100" step="1">
-      <div id="orc-aviso" class="note warn" hidden></div>
+      <p class="small">Árvores contadas pelo espaçamento mínimo do Manual de Arborização Urbana de Fortaleza (2020): médio porte (8 m) nas praças e pequeno porte (5 m) ao longo das calçadas.</p>
 
-      <details id="premissas">
-        <summary>Custos e premissas</summary>
-        <div class="row"><label>Muda + plantio por árvore (R$)</label><input type="number" id="custo-arvore" min="0" step="1" placeholder="informar"></div>
-        <div class="row"><label>Manutenção por árvore, 2 a 3 anos (R$)</label><input type="number" id="custo-manut" min="0" step="1" placeholder="informar"></div>
-        <div class="row"><label>Porte das árvores</label>
-          <select id="porte">
-            <option value="misto">Misto recomendado (praças e lotes: médio; calçadas: pequeno)</option>
-            <option value="pequeno">Pequeno porte (espaçamento de 5 m)</option>
-            <option value="medio">Médio porte (8 m; calçadas de 2,00 m ou mais)</option>
-            <option value="grande">Grande porte nas praças e lotes (12 m); médio nas calçadas</option>
-          </select></div>
-        <p class="small">Espaçamentos mínimos do Manual de Arborização Urbana de Fortaleza (2020, p. 68): 5 m (pequeno), 8 m (médio) e 12 m (grande). Sob fiação, só pequeno porte. Nas calçadas, conta-se uma árvore a cada espaçamento ao longo da faixa de 2,5 m. Os custos devem vir de fonte oficial (ata de registro de preços da Prefeitura ou SINAPI-PI).</p>
-        <div id="ref-custo" class="note"></div>
-      </details>
-
-      <h3>Estratégia de escolha</h3>
+      <h3>Como escolher as áreas</h3>
       <div class="radios" id="estrategia">
-        <label><input type="radio" name="estr" value="eficiencia" checked><span>Maior resfriamento por árvore<small>áreas em que cada árvore produz mais frescor</small></span></label>
-        <label><input type="radio" name="estr" value="multicriterio"><span>Multicritério do modelo<small>potencial de resfriamento estimado pela rede + calor do local</small></span></label>
-        <label><input type="radio" name="estr" value="quente"><span>Mais quentes primeiro<small>prioriza as áreas de maior temperatura</small></span></label>
+        <label><input type="radio" name="estr" value="eficiencia" checked><span>Maior resfriamento por árvore<small>o mapa escolhe as áreas em que cada árvore refresca mais</small></span></label>
         <label><input type="radio" name="estr" value="manual"><span>Seleção manual<small>clique nas áreas do mapa para incluir ou retirar</small></span></label>
       </div>
 
@@ -70,40 +52,20 @@
       <div class="checks">
         <label><input type="checkbox" class="f-tipo" value="praca" checked> <span class="pill praca">Praças e parques</span></label>
         <label><input type="checkbox" class="f-tipo" value="calcada" checked> <span class="pill calcada">Calçadas e canteiros</span></label>
-        <label><input type="checkbox" class="f-tipo" value="livre"> <span class="pill livre">Áreas livres (a verificar)</span></label>
       </div>
       <div class="row"><select id="f-bairro"><option value="">Todos os bairros</option></select></div>
       <div class="checks">
         <label><input type="checkbox" id="f-equip"> Até <input type="number" id="f-dist" value="300" min="50" step="50" style="width:70px"> m de escola, creche ou unidade de saúde</label>
-        <label><input type="checkbox" id="f-incerteza"> Só onde o modelo tem baixa incerteza (&lt; 0,5 °C)</label>
       </div>
 
       <h2>Resultado do plano</h2>
       <div class="cards" id="cards"></div>
       <p class="small" id="resumo-nota"></p>
-      <div class="chartbox"><canvas id="chart-curva"></canvas></div>
-      <p class="small">Resfriamento integrado acumulado (°C·ha) conforme o número de árvores, para cada estratégia. A linha vertical marca o plano atual.</p>
       <div class="row"><button class="btn fix" id="btn-gerar">Gerar plano completo</button><button class="btn ghost fix" id="btn-link">Copiar link do plano</button><span class="small" id="link-ok"></span></div>
-      <p class="small">O plano completo abre numa nova aba: mapa do trecho, custos, quando o efeito aparece (crescimento das árvores), espécies nativas recomendadas, cenários e tabela das áreas com coordenadas.</p>
+      <p class="small">O plano completo abre numa nova aba: mapa do trecho, áreas com localização, bairros atendidos e espécies nativas recomendadas.</p>
 
       <h3>Áreas do plano</h3>
       <div class="tablewrap"><table id="tab-areas"><thead><tr><th>#</th><th>Tipo</th><th>Bairro</th><th class="num">Árvores</th><th class="num">ΔT</th><th>Perto de</th></tr></thead><tbody></tbody></table></div>
-
-      <h2>Desenhar uma área livre</h2>
-      <p class="small">Desenhe qualquer área no mapa: o modelo roda no seu navegador e calcula o efeito de arborizar só a parte plantável dela. Funciona melhor no Chrome ou no Edge (placa de vídeo); na primeira vez baixa 26 MB.</p>
-      <div class="checks">
-        <label><input type="checkbox" class="d-classe" checked> Praças e parques</label>
-        <label><input type="checkbox" class="d-classe" checked> Calçadas e canteiros</label>
-        <label><input type="checkbox" class="d-classe"> Lotes livres (em geral privados)</label>
-      </div>
-      <div class="row">
-        <button class="btn fix" id="d-iniciar">Desenhar</button>
-        <button class="btn ghost fix" id="d-concluir">Concluir</button>
-        <button class="btn fix" id="d-simular">Simular</button>
-        <button class="btn ghost fix" id="d-limpar">Limpar</button>
-      </div>
-      <p class="small" id="d-status"></p>
-      <div id="d-resultado"></div>
     </section>
 
     <!-- BAIRROS -->
@@ -135,28 +97,22 @@
     <section class="panel" id="tab-confiavel">
       <h2>O modelo é confiável?</h2>
       <div class="cards" id="conf-cards"></div>
-      <div class="chartbox"><canvas id="chart-ref"></canvas></div>
-      <p class="small">Erro médio (MAE, °C) da anomalia de temperatura em cidades que o modelo não viu no treino, na mesma régua para todos os métodos. Quanto menor, melhor. A persistência usa a temperatura do mês anterior como entrada e serve só de referência.</p>
-      <h3>Validação cruzada por cidade (época fixa, sem escolha pela validação)</h3>
+      <h3>Validação cruzada por cidade</h3>
       <table id="tab-folds"><thead><tr><th>Fold</th><th>Cidades de validação</th><th class="num">MAE</th><th class="num">Ilha</th><th class="num">IoU</th></tr></thead><tbody></tbody></table>
+      <p class="small">Erro médio (MAE, °C) em cidades que o modelo não viu no treino; "Ilha" é o erro só nos pontos mais quentes.</p>
       <div id="valid-real">
         <h2>Teste com o mundo real: onde a vegetação mudou</h2>
         <p class="small" id="vn-texto"></p>
         <div class="cards" id="vn-cards"></div>
         <div class="chartbox"><canvas id="chart-natural"></canvas></div>
-        <p class="small">Mudança da temperatura da superfície (em relação à média da cidade) conforme a mudança de vegetação (NDVI) de cada pixel. Observado pelo satélite × previsto pelo modelo só com as mudanças de vegetação, construção, água e relevo.</p>
+        <p class="small">Mudança da temperatura da superfície conforme a mudança de vegetação (NDVI) de cada pixel: observado pelo satélite × previsto pelo modelo.</p>
         <h2>Parques que já existem</h2>
         <p class="small" id="vp-texto"></p>
         <div class="chartbox"><canvas id="chart-parques"></canvas></div>
-        <div class="tablewrap" style="max-height:220px"><table id="tab-parques"><thead><tr><th>Parque ou praça</th><th class="num">ha</th><th class="num">Observado</th><th class="num">Previsto</th></tr></thead><tbody></tbody></table></div>
-        <h2>O que o modelo usa</h2>
-        <div class="chartbox" style="height:150px"><canvas id="chart-ablacao"></canvas></div>
-        <p class="small" id="va-texto"></p>
       </div>
       <div id="valid-inmet">
         <h2>Superfície × temperatura do ar</h2>
         <p class="small" id="vi-texto"></p>
-        <div class="chartbox"><canvas id="chart-inmet"></canvas></div>
       </div>
       <h3>Limitações, em linguagem simples</h3>
       <ul id="limitacoes" class="small"></ul>
@@ -165,9 +121,9 @@
     <!-- SOBRE -->
     <section class="panel" id="tab-sobre">
       <h2>Como ler este mapa</h2>
-      <p>O ARBORMAP usa imagens do satélite Landsat (30 m) e uma rede neural, a UrbanHeatNet, para prever onde a superfície da cidade fica mais quente, a partir da vegetação, das construções, da água e do relevo. Depois simula o efeito de arborizar cada área.</p>
-      <p>As cores do mapa mostram quanto cada ponto fica acima (vermelho) ou abaixo (azul) da temperatura média da superfície de Teresina na estação seca (junho a outubro).</p>
-      <p>O resfriamento simulado é <b>local</b> e vale para as árvores já crescidas, com copas formadas, o que leva de 5 a 10 anos.</p>
+      <p>O ARBORMAP usa imagens do satélite Landsat (30 m) e uma rede neural, a UrbanHeatNet, para prever onde a superfície da cidade fica mais quente, a partir da vegetação, das construções, da água e do relevo. Depois simula o efeito de arborizar praças e calçadas.</p>
+      <p>As cores do mapa mostram quanto cada ponto fica acima (vermelho) ou abaixo (azul) da temperatura média da superfície da área mapeada na estação seca (junho a outubro).</p>
+      <p>O resfriamento simulado é <b>local</b> e vale para as árvores já crescidas, com copas formadas.</p>
       <h3>Fontes</h3>
       <ul id="fontes" class="small"></ul>
       <h3>Premissas</h3>
@@ -192,7 +148,6 @@
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="app.js?v=10"></script>
-<script src="desenho.js?v=10"></script>
+<script src="app.js?v=11"></script>
 </body>
 </html>
