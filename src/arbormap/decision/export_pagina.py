@@ -33,6 +33,19 @@ PREMISSAS = {
 }
 
 
+# Referência de preço enquanto não houver a ata da SEMAM nem o SINAPI do Piauí: a página só a usa
+# se o gestor clicar em "usar referência"; os campos de custo começam vazios.
+CUSTOS_REFERENCIA = {
+    "plantio": {
+        "valor": 95.15,
+        "descricao": "SINAPI 98510: plantio de árvore ornamental com muda de até 2,00 m (muda de 1 m, jardineiro e servente; sem adubação)",
+        "base": "média nacional, 09/2026, não desonerado",
+        "fonte": "SINAPI (Caixa), composição consultada em orcamentor.com/composicao/98510",
+        "pendente": "confirmar o valor do Piauí na planilha SINAPI-PI ou usar a ata de registro de preços da SEMAM",
+    },
+}
+
+
 def _rgba(values, valid, cmap, vmin, vmax):
     norm = np.clip((values - vmin) / (vmax - vmin + 1e-9), 0, 1)
     rgba = matplotlib.colormaps[cmap](np.nan_to_num(norm))
@@ -86,6 +99,8 @@ def exportar(derivados, drive_final, out_dir, city="Teresina"):
     binfo = json.loads((D / f"{p}_bairros_info.json").read_text(encoding="utf-8"))
     ainfo_p = D / f"{p}_areas_info.json"
     ainfo = json.loads(ainfo_p.read_text(encoding="utf-8")) if ainfo_p.exists() else {}
+    vreal_p = D / f"{p}_validacao_real.json"
+    vreal = json.loads(vreal_p.read_text(encoding="utf-8")) if vreal_p.exists() else None
     m = {
         "cidade": city,
         "bounds_leaflet": [[s, w], [n, e]],
@@ -107,6 +122,8 @@ def exportar(derivados, drive_final, out_dir, city="Teresina"):
         "verificacao": verif["resumo"],
         "bairros": binfo,
         "areas": ainfo,
+        "validacao_real": vreal,
+        "custos_referencia": CUSTOS_REFERENCIA,
         "premissas": PREMISSAS,
         "fontes": [
             "Landsat 8/9 (USGS), via Google Earth Engine: LST, NDVI, NDBI, NDWI; SRTM: DEM",

@@ -66,9 +66,12 @@ async function carregar() {
   lerHash();
   iniciarMapa();
   iniciarControles();
+  if (typeof iniciarControlesDesenho === "function") iniciarControlesDesenho();
   preencherConfiabilidade();
+  preencherValidacaoReal();
   preencherSobre();
   atualizarTudo();
+  if (new URLSearchParams(location.search).get("modo") === "cidadao") mudarModo("cidadao");
 }
 
 /* ---------------- bairros: índice calor × vulnerabilidade ---------------- */
@@ -161,7 +164,8 @@ function iniciarMapa() {
     anomalia: ov("anomalia", 0.7), incerteza: ov("incerteza", 0.75), plantavel: ov("plantavel", 0.8), inviavel: ov("inviavel", 0.6),
   };
   camadas.anomalia.addTo(map);
-  layerBairros = L.geoJSON(S.bairros, { style: estiloBairro, onEachFeature: (f, l) => l.on("click", () => selecionarBairro(f.properties.cd_bairro, true)) }).addTo(map);
+  const desenhando = () => typeof DES !== "undefined" && DES.ativo;
+  layerBairros = L.geoJSON(S.bairros, { style: estiloBairro, onEachFeature: (f, l) => l.on("click", () => { if (!desenhando()) selecionarBairro(f.properties.cd_bairro, true); }) }).addTo(map);
   layerAreas = L.geoJSON(null, { style: estiloArea, onEachFeature: ligarArea }).addTo(map);
   layerEquip = L.layerGroup(S.equip.map((f) => {
     const [lon, lat] = f.geometry.coordinates, c = f.properties.categoria;
@@ -234,7 +238,7 @@ function popupArea(p) {
     ${S.modo === "gestor" ? `<br><button class="btn ${no ? "ghost" : ""}" style="margin-top:6px" onclick="alternarArea(${p.id})">${no ? "Retirar do plano" : "Incluir no plano"}</button>` : ""}`;
 }
 function ligarArea(f, l) {
-  l.on("click", () => l.bindPopup(popupArea(f.properties)).openPopup());
+  l.on("click", () => { if (typeof DES !== "undefined" && DES.ativo) return; l.bindPopup(popupArea(f.properties)).openPopup(); });
 }
 window.alternarArea = (id) => {
   if (S.estrategia !== "manual") {
@@ -263,6 +267,13 @@ function iniciarControles() {
   $("#orc-slider").oninput = (e) => { S.orcArvores = +e.target.value; atualizarTudo(); };
   const num = (id, k) => { const el = $(id); el.value = S[k] ?? ""; el.oninput = () => { S[k] = el.value === "" ? null : +el.value; atualizarTudo(); }; };
   num("#custo-arvore", "custoArvore"); num("#custo-manut", "custoManut");
+  const ref = S.meta.custos_referencia?.plantio;
+  if (ref) {
+    $("#ref-custo").innerHTML = `Referência disponível: <b>R$ ${fmt(ref.valor, 2)}</b> por árvore. ${esc(ref.descricao)}; ${esc(ref.base)}. Fonte: ${esc(ref.fonte)}.
+      <span class="warn">Pendente: ${esc(ref.pendente)}.</span> A manutenção não tem referência e fica a informar.
+      <div style="margin-top:6px"><button class="btn ghost" id="usar-ref">Usar esta referência</button></div>`;
+    $("#usar-ref").onclick = () => { S.custoArvore = ref.valor; $("#custo-arvore").value = ref.valor; atualizarTudo(); };
+  }
   $("#m2-arvore").value = S.m2;
   $("#m2-arvore").oninput = (e) => { S.m2 = Math.max(4, +e.target.value || 36); atualizarTudo(); };
 
@@ -356,11 +367,11 @@ function atualizarTudo(reescreverValor = true) {
     ["hl", fmt(r.dt, 2) + " °C", "resfriamento médio no local plantado"],
     ["", fmt(r.a05, 0) + " ha", "ficam ao menos 0,5 °C mais frescos"],
     ["", fmt(r.integ, 0), "resfriamento integrado (°C·ha)"],
-    ["", r.custo != null ? "R$ " + fmt(r.custo) : "informar custo", r.custo != null ? "custo estimado (plantio + manutenção)" : "custo: abra \"Custos e premissas\""],
+    ["", r.custo != null ? "R$ " + fmt(r.custo) : "informar custo", r.custo != null ? (S.custoManut ? "custo estimado (plantio + manutenção)" : "custo estimado (só plantio; manutenção a informar)") : "custo: abra \"Custos e premissas\""],
   ].map(([c, v, k]) => `<div class="card ${c}"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
   $("#resumo-nota").innerHTML = r.n > 1
-    ? `${fmt(r.perto)} das ${fmt(r.n)} áreas ficam a até 300 m de escola, creche ou unidade de saúde. Áreas vizinhas não somam integralmente: os totais aplicam a razão medida entre o efeito conjunto e a soma dos individuais (${fmt(r.razao, 2)}). Efeito para copas formadas (5 a 10 anos).`
-    : "Efeito para copas formadas (5 a 10 anos).";
+    ? `${fmt(r.perto)} das ${fmt(r.n)} áreas ficam a até 300 m de escola, creche ou unidade de saúde. Áreas vizinhas não somam integralmente: os totais aplicam a razão medida entre o efeito conjunto e a soma dos individuais (${fmt(r.razao, 2)}). Efeito para copas formadas (5 a 10 anos); trate-o como limite superior (ver Confiabilidade).`
+    : "Efeito para copas formadas (5 a 10 anos); trate-o como limite superior (ver Confiabilidade).";
 
   const tb = $("#tab-areas tbody");
   tb.innerHTML = plano.slice().sort((a, b) => b.properties.resfriamento_int - a.properties.resfriamento_int).map((f) => {
@@ -510,15 +521,60 @@ function preencherConfiabilidade() {
   const ad = m.areas?.aditividade;
   $("#limitacoes").innerHTML = [
     "A temperatura é a da superfície (chão, telhados, copas), medida por satélite às 10h da manhã, e não a temperatura do ar.",
-    "O modelo prevê quanto cada ponto fica acima ou abaixo da média da própria cidade. Por isso o resfriamento simulado é local: mostra onde a arborização refresca, não quanto cai a média de Teresina.",
+    "O modelo prevê quanto cada ponto fica acima ou abaixo da média da própria cidade. Por isso o resfriamento simulado é local: mostra onde a arborização refresca, não quanto cai a média de Teresina. Na conta do modelo, o frescor de uma área aparece compensado por um aquecimento leve e espalhado pelo resto da cidade; isso vem da forma como o modelo foi treinado, não é um efeito físico, e por isso o resfriamento integrado (°C·ha) soma só o frescor.",
+    "Plantios muito esparsos (só uma faixa estreita de calçada em cada pixel de 30 m) mudam pouco o que o satélite vê; nesses casos o modelo pode não detectar efeito.",
     "A persistência (repetir o mês anterior) erra menos, mas precisa da temperatura medida; o modelo prevê só com vegetação, construções, água e relevo, o que permite simular cenários.",
     "O efeito vale para árvores adultas, com copa formada, o que leva de 5 a 10 anos.",
+    m.validacao_real ? `Nos parques que já existem, o modelo previu mais frescor do que o satélite mede (${fmt(m.validacao_real.parques.pred_media_c, 2)} °C × ${fmt(m.validacao_real.parques.obs_media_c, 2)} °C em média): os valores simulados são um limite superior.` : null,
     "O espaço para plantio foi estimado com mapas abertos (OpenStreetMap e Overture). Fiação, largura real da calçada, tubulações e propriedade dos lotes precisam ser verificadas em campo.",
     ad ? `Áreas vizinhas não somam integralmente: plantando juntas as ${ad.n_areas} áreas de maior efeito, o resultado foi ${fmt(ad.razao_conjunto_soma * 100)}% da soma dos efeitos individuais; os totais do plano usam essa razão.` : null,
     `A imagem cobre ${m.bairros.n_com_metricas} dos ${m.bairros.n_bairros} bairros; o restante será incluído numa próxima versão.`,
     "Áreas hachuradas no mapa (água, encostas e falhas fixas do dado de satélite) não recebem previsão nem plantio.",
   ].filter(Boolean).map((t) => `<li>${t}</li>`).join("");
 }
+function preencherValidacaoReal() {
+  const v = S.meta.validacao_real;
+  if (!v) { $("#valid-real").style.display = "none"; return; }
+  const n = v.experimento_natural, g = n.grupos, anos = (a) => `${a[0]}–${String(a[a.length - 1]).slice(2)}`;
+  $("#vn-texto").innerHTML = `Comparamos a estação seca de ${anos(n.anos_a)} com a de ${anos(n.anos_b)}. Onde a vegetação aumentou ou diminuiu de verdade, a temperatura observada pelo satélite mudou quase exatamente como o modelo previu. Isso testa o mesmo mecanismo usado na simulação de plantio, com dados que o modelo não viu.`;
+  $("#vn-cards").innerHTML = [
+    ["hl", `${sinal(g.ganhou_vegetacao.dT_observado_c, 2)} °C`, `observado onde a vegetação aumentou (${fmt(g.ganhou_vegetacao.n_pixels)} pixels); previsto: ${sinal(g.ganhou_vegetacao.dT_previsto_c, 2)} °C`],
+    ["", `${sinal(g.perdeu_vegetacao.dT_observado_c, 2)} °C`, `observado onde a vegetação diminuiu (${fmt(g.perdeu_vegetacao.n_pixels)} pixels); previsto: ${sinal(g.perdeu_vegetacao.dT_previsto_c, 2)} °C`],
+    ["", fmt(n.pearson_pixels_que_mudaram, 2), "correlação entre mudança observada e prevista, pixel a pixel"],
+    ["", `${fmt(n.inclinacao_obs_c_por_0p1_ndvi, 2)} × ${fmt(n.inclinacao_pred_c_por_0p1_ndvi, 2)}`, "°C por +0,1 de NDVI: observado × previsto"],
+  ].map(([k, a, b]) => `<div class="card ${k}"><div class="v">${a}</div><div class="k">${b}</div></div>`).join("");
+  new Chart($("#chart-natural"), {
+    type: "line",
+    data: { labels: n.curva.map((c) => fmt(c.dndvi, 2)), datasets: [
+      { label: "Observado", data: n.curva.map((c) => c.obs), borderColor: "#111", backgroundColor: "#111", pointRadius: 3, tension: 0.2 },
+      { label: "Previsto pelo modelo", data: n.curva.map((c) => c.pred), borderColor: "#1f7a4d", backgroundColor: "#1f7a4d", borderDash: [5, 4], pointRadius: 3, tension: 0.2 }] },
+    options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { labels: { boxWidth: 10, font: { size: 10 } } } },
+      scales: { x: { title: { display: true, text: "mudança de NDVI (mais vegetação →)" } }, y: { title: { display: true, text: "mudança de temperatura (°C)" } } } },
+  });
+  const p = v.parques;
+  $("#vp-texto").innerHTML = `Em ${p.n_parques} parques e praças arborizados de Teresina, o entorno é em média <b>${fmt(p.obs_media_c, 2)} °C</b> mais quente que o interior (satélite). O modelo acerta quais parques refrescam mais (correlação ${fmt(p.pearson, 2)}), mas <b>superestima</b> a diferença (${fmt(p.pred_media_c, 2)} °C em média). Por isso os resfriamentos simulados devem ser lidos como um limite superior.`;
+  const lim = Math.ceil(Math.max(...p.parques.flatMap((q) => [q.obs_c, q.pred_c]).map(Math.abs)));
+  new Chart($("#chart-parques"), {
+    type: "scatter",
+    data: { datasets: [
+      { label: "Parques", data: p.parques.map((q) => ({ x: q.obs_c, y: q.pred_c, nome: q.nome })), backgroundColor: "#1f7a4d", pointRadius: 4 },
+      { label: "Acerto perfeito", type: "line", data: [{ x: -lim, y: -lim }, { x: lim, y: lim }], borderColor: "#999", borderDash: [4, 4], pointRadius: 0, borderWidth: 1 }] },
+    options: { responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { labels: { boxWidth: 10, font: { size: 10 } } }, tooltip: { callbacks: { label: (c) => c.raw.nome ? `${c.raw.nome}: obs. ${fmt(c.raw.x, 2)} °C, prev. ${fmt(c.raw.y, 2)} °C` : "" } } },
+      scales: { x: { min: -lim, max: lim, title: { display: true, text: "observado (°C, entorno − interior)" } }, y: { min: -lim, max: lim, title: { display: true, text: "previsto (°C)" } } } },
+  });
+  $("#tab-parques tbody").innerHTML = p.parques.map((q) => `<tr><td>${esc(q.nome)}</td><td class="num">${fmt(q.area_ha, 1)}</td><td class="num">${sinal(q.obs_c, 2)}</td><td class="num">${sinal(q.pred_c, 2)}</td></tr>`).join("");
+  const a = v.ablacao, canais = ["NDVI", "NDWI", "NDBI", "DEM"], nomes = { NDVI: "Vegetação (NDVI)", NDWI: "Água e umidade (NDWI)", NDBI: "Construções (NDBI)", DEM: "Relevo (DEM)" };
+  new Chart($("#chart-ablacao"), {
+    type: "bar",
+    data: { labels: canais.map((c) => nomes[c]), datasets: [{ data: canais.map((c) => Math.max(0, a[c].piora_mae_c)), backgroundColor: "#1f7a4d" }] },
+    options: { indexAxis: "y", responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: (c) => `erro sobe ${fmt(a[canais[c.dataIndex]].piora_mae_c, 2)} °C sem esta informação` } } },
+      scales: { x: { beginAtZero: true, title: { display: true, text: "quanto o erro aumenta sem a informação (°C)" } } } },
+  });
+  $("#va-texto").textContent = `Retirando uma informação de cada vez (em Teresina, erro de ${fmt(a.completo.mae_c, 2)} °C com tudo): sem a vegetação o erro sobe ${fmt(a.NDVI.piora_mae_c, 1)} °C; sem água e umidade, ${fmt(a.NDWI.piora_mae_c, 1)} °C; sem construções, ${fmt(a.NDBI.piora_mae_c, 1)} °C; o relevo quase não pesa. A vegetação é o que o modelo mais usa, e é justamente o que a arborização muda.`;
+}
+
 function preencherSobre() {
   const m = S.meta;
   $("#fontes").innerHTML = m.fontes.map((f) => `<li>${esc(f)}</li>`).join("") +

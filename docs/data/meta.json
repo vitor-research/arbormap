@@ -213,6 +213,465 @@
   },
   "n_areas": 355
  },
+ "validacao_real": {
+  "experimento_natural": {
+   "anos_a": [
+    2018,
+    2019,
+    2020,
+    2021
+   ],
+   "anos_b": [
+    2023,
+    2024
+   ],
+   "cenas_a": [
+    "2018_06.npy",
+    "2018_08.npy",
+    "2020_07.npy",
+    "2020_08.npy",
+    "2021_07.npy"
+   ],
+   "cenas_b": [
+    "2023_06.npy",
+    "2023_07.npy",
+    "2023_09.npy",
+    "2024_06.npy",
+    "2024_07.npy"
+   ],
+   "limiar_dndvi": 0.15,
+   "grupos": {
+    "ganhou_vegetacao": {
+     "n_pixels": 2786,
+     "dT_observado_c": -1.0,
+     "dT_previsto_c": -1.06
+    },
+    "perdeu_vegetacao": {
+     "n_pixels": 3850,
+     "dT_observado_c": 1.06,
+     "dT_previsto_c": 1.2
+    },
+    "estavel": {
+     "n_pixels": 105191,
+     "dT_observado_c": 0.05,
+     "dT_previsto_c": 0.03
+    }
+   },
+   "pearson_pixels_que_mudaram": 0.753,
+   "mae_pixels_que_mudaram_c": 1.03,
+   "inclinacao_obs_c_por_0p1_ndvi": -0.411,
+   "inclinacao_pred_c_por_0p1_ndvi": -0.448,
+   "curva": [
+    {
+     "dndvi": -0.375,
+     "obs": 0.947,
+     "pred": 1.144,
+     "n": 245
+    },
+    {
+     "dndvi": -0.325,
+     "obs": 1.079,
+     "pred": 1.261,
+     "n": 312
+    },
+    {
+     "dndvi": -0.275,
+     "obs": 0.952,
+     "pred": 1.07,
+     "n": 480
+    },
+    {
+     "dndvi": -0.225,
+     "obs": 0.96,
+     "pred": 0.958,
+     "n": 808
+    },
+    {
+     "dndvi": -0.175,
+     "obs": 0.734,
+     "pred": 0.795,
+     "n": 1400
+    },
+    {
+     "dndvi": -0.125,
+     "obs": 0.582,
+     "pred": 0.605,
+     "n": 3105
+    },
+    {
+     "dndvi": -0.075,
+     "obs": 0.268,
+     "pred": 0.278,
+     "n": 9078
+    },
+    {
+     "dndvi": -0.025,
+     "obs": 0.122,
+     "pred": 0.103,
+     "n": 39412
+    },
+    {
+     "dndvi": 0.025,
+     "obs": 0.001,
+     "pred": -0.013,
+     "n": 65779
+    },
+    {
+     "dndvi": 0.075,
+     "obs": -0.258,
+     "pred": -0.279,
+     "n": 20852
+    },
+    {
+     "dndvi": 0.125,
+     "obs": -0.604,
+     "pred": -0.616,
+     "n": 5865
+    },
+    {
+     "dndvi": 0.175,
+     "obs": -0.936,
+     "pred": -0.956,
+     "n": 1787
+    },
+    {
+     "dndvi": 0.225,
+     "obs": -1.201,
+     "pred": -1.293,
+     "n": 626
+    },
+    {
+     "dndvi": 0.275,
+     "obs": -1.073,
+     "pred": -1.298,
+     "n": 221
+    },
+    {
+     "dndvi": 0.325,
+     "obs": -0.987,
+     "pred": -1.125,
+     "n": 100
+    },
+    {
+     "dndvi": 0.375,
+     "obs": -0.541,
+     "pred": -1.128,
+     "n": 31
+    }
+   ]
+  },
+  "parques": {
+   "n_parques": 38,
+   "obs_media_c": 0.76,
+   "pred_media_c": 1.12,
+   "pearson": 0.935,
+   "mae_c": 0.59,
+   "parques": [
+    {
+     "nome": "Jardim Botânico de Teresina",
+     "area_ha": 38.9,
+     "ndvi": 0.79,
+     "obs_c": 5.45,
+     "pred_c": 5.12
+    },
+    {
+     "nome": "Campo Agrícola Apolônia II",
+     "area_ha": 17.6,
+     "ndvi": 0.67,
+     "obs_c": -0.97,
+     "pred_c": -0.72
+    },
+    {
+     "nome": "(sem nome no OSM)",
+     "area_ha": 15.6,
+     "ndvi": 0.59,
+     "obs_c": 3.31,
+     "pred_c": 3.85
+    },
+    {
+     "nome": "Parque da Cidade João Mendes Olímpio de Melo",
+     "area_ha": 14.3,
+     "ndvi": 0.72,
+     "obs_c": 3.74,
+     "pred_c": 3.32
+    },
+    {
+     "nome": "Parque da Cidadania",
+     "area_ha": 7.0,
+     "ndvi": 0.45,
+     "obs_c": 1.53,
+     "pred_c": 1.9
+    },
+    {
+     "nome": "Horta Comunitária da Tabuleta",
+     "area_ha": 5.3,
+     "ndvi": 0.57,
+     "obs_c": 0.48,
+     "pred_c": 1.02
+    },
+    {
+     "nome": "Parque Tropical",
+     "area_ha": 5.3,
+     "ndvi": 0.61,
+     "obs_c": 2.28,
+     "pred_c": 2.41
+    },
+    {
+     "nome": "Praça do Escolão do Mocambinho",
+     "area_ha": 3.6,
+     "ndvi": 0.44,
+     "obs_c": 1.15,
+     "pred_c": 2.02
+    },
+    {
+     "nome": "Horta Carlos Feitosa",
+     "area_ha": 3.1,
+     "ndvi": 0.68,
+     "obs_c": 0.6,
+     "pred_c": 0.33
+    },
+    {
+     "nome": "Praça da Rosa dos Ventos e Biblioteca Central",
+     "area_ha": 2.8,
+     "ndvi": 0.45,
+     "obs_c": 0.36,
+     "pred_c": -0.39
+    },
+    {
+     "nome": "Praça da Bandeira",
+     "area_ha": 2.6,
+     "ndvi": 0.67,
+     "obs_c": 2.14,
+     "pred_c": 3.21
+    },
+    {
+     "nome": "Horta Comunitária Geovane Prado",
+     "area_ha": 2.6,
+     "ndvi": 0.5,
+     "obs_c": -0.83,
+     "pred_c": -0.41
+    },
+    {
+     "nome": "Praça Saraiva",
+     "area_ha": 2.4,
+     "ndvi": 0.65,
+     "obs_c": 3.19,
+     "pred_c": 3.63
+    },
+    {
+     "nome": "Horta Comunitária  Piçarreira",
+     "area_ha": 2.4,
+     "ndvi": 0.45,
+     "obs_c": -1.34,
+     "pred_c": -0.91
+    },
+    {
+     "nome": "Campo Agrícola Sinha Borges II",
+     "area_ha": 2.4,
+     "ndvi": 0.55,
+     "obs_c": -4.2,
+     "pred_c": -2.42
+    },
+    {
+     "nome": "Horta Comunitária Mafrense",
+     "area_ha": 2.3,
+     "ndvi": 0.49,
+     "obs_c": -1.64,
+     "pred_c": -1.52
+    },
+    {
+     "nome": "Horta Comunitária Fraternidade",
+     "area_ha": 2.3,
+     "ndvi": 0.38,
+     "obs_c": 0.63,
+     "pred_c": 0.22
+    },
+    {
+     "nome": "Praça da Liberdade",
+     "area_ha": 2.1,
+     "ndvi": 0.4,
+     "obs_c": 0.31,
+     "pred_c": 0.55
+    },
+    {
+     "nome": "Parque Ambiental Mini Horto da Samambaia",
+     "area_ha": 2.1,
+     "ndvi": 0.76,
+     "obs_c": 4.02,
+     "pred_c": 4.02
+    },
+    {
+     "nome": "(sem nome no OSM)",
+     "area_ha": 2.0,
+     "ndvi": 0.49,
+     "obs_c": 1.09,
+     "pred_c": 1.26
+    },
+    {
+     "nome": "(sem nome no OSM)",
+     "area_ha": 2.0,
+     "ndvi": 0.5,
+     "obs_c": 0.63,
+     "pred_c": 2.22
+    },
+    {
+     "nome": "Horta Comunitária Sinha Borges",
+     "area_ha": 2.0,
+     "ndvi": 0.57,
+     "obs_c": -2.43,
+     "pred_c": -1.24
+    },
+    {
+     "nome": "Horta Comunitária Dique",
+     "area_ha": 2.0,
+     "ndvi": 0.57,
+     "obs_c": 0.04,
+     "pred_c": 1.46
+    },
+    {
+     "nome": "Horta Comunitária São Raimundo",
+     "area_ha": 1.5,
+     "ndvi": 0.54,
+     "obs_c": 0.62,
+     "pred_c": 1.27
+    },
+    {
+     "nome": "Praça Teotônio Vilela",
+     "area_ha": 1.3,
+     "ndvi": 0.54,
+     "obs_c": 1.01,
+     "pred_c": 2.05
+    },
+    {
+     "nome": "(sem nome no OSM)",
+     "area_ha": 1.3,
+     "ndvi": 0.45,
+     "obs_c": 0.18,
+     "pred_c": 1.03
+    },
+    {
+     "nome": "(sem nome no OSM)",
+     "area_ha": 1.3,
+     "ndvi": 0.5,
+     "obs_c": -0.15,
+     "pred_c": 1.04
+    },
+    {
+     "nome": "(sem nome no OSM)",
+     "area_ha": 1.2,
+     "ndvi": 0.46,
+     "obs_c": -1.09,
+     "pred_c": 0.8
+    },
+    {
+     "nome": "(sem nome no OSM)",
+     "area_ha": 1.2,
+     "ndvi": 0.43,
+     "obs_c": -2.07,
+     "pred_c": -1.43
+    },
+    {
+     "nome": "Parque Ambiental Marina",
+     "area_ha": 1.2,
+     "ndvi": 0.6,
+     "obs_c": 1.45,
+     "pred_c": 1.46
+    },
+    {
+     "nome": "Praça de Santa Joana D'arc",
+     "area_ha": 1.1,
+     "ndvi": 0.46,
+     "obs_c": 0.56,
+     "pred_c": 0.65
+    },
+    {
+     "nome": "Praça Teresa Helena Castelo Branco",
+     "area_ha": 1.1,
+     "ndvi": 0.75,
+     "obs_c": 3.21,
+     "pred_c": 2.75
+    },
+    {
+     "nome": "Parque Ambiental Matias Matos",
+     "area_ha": 1.1,
+     "ndvi": 0.42,
+     "obs_c": 1.65,
+     "pred_c": 1.59
+    },
+    {
+     "nome": "Praça Senador Bernardino Viana",
+     "area_ha": 1.1,
+     "ndvi": 0.6,
+     "obs_c": 1.24,
+     "pred_c": 0.79
+    },
+    {
+     "nome": "(sem nome no OSM)",
+     "area_ha": 1.0,
+     "ndvi": 0.61,
+     "obs_c": 1.9,
+     "pred_c": 1.8
+    },
+    {
+     "nome": "Praça do Gari",
+     "area_ha": 0.9,
+     "ndvi": 0.37,
+     "obs_c": -0.24,
+     "pred_c": -0.21
+    },
+    {
+     "nome": "Horta comunitária São Francisco Norte",
+     "area_ha": 0.9,
+     "ndvi": 0.48,
+     "obs_c": -0.98,
+     "pred_c": -0.77
+    },
+    {
+     "nome": "Praça Edgard Nogueira",
+     "area_ha": 0.9,
+     "ndvi": 0.69,
+     "obs_c": 1.88,
+     "pred_c": 0.89
+    }
+   ]
+  },
+  "ablacao": {
+   "completo": {
+    "mae_c": 1.01,
+    "pearson": 0.914
+   },
+   "NDVI": {
+    "mae_c": 2.4,
+    "pearson": 0.469,
+    "piora_mae_c": 1.4
+   },
+   "NDBI": {
+    "mae_c": 1.27,
+    "pearson": 0.866,
+    "piora_mae_c": 0.26
+   },
+   "DEM": {
+    "mae_c": 1.0,
+    "pearson": 0.915,
+    "piora_mae_c": -0.01
+   },
+   "NDWI": {
+    "mae_c": 1.4,
+    "pearson": 0.757,
+    "piora_mae_c": 0.4
+   }
+  },
+  "modelo": "best_hybrid_fold_0.pt"
+ },
+ "custos_referencia": {
+  "plantio": {
+   "valor": 95.15,
+   "descricao": "SINAPI 98510: plantio de árvore ornamental com muda de até 2,00 m (muda de 1 m, jardineiro e servente; sem adubação)",
+   "base": "média nacional, 09/2026, não desonerado",
+   "fonte": "SINAPI (Caixa), composição consultada em orcamentor.com/composicao/98510",
+   "pendente": "confirmar o valor do Piauí na planilha SINAPI-PI ou usar a ata de registro de preços da SEMAM"
+  }
+ },
  "premissas": {
   "largura_pista_m": "por tipo de via do OpenStreetMap (residencial 7 m, terciária 10 m, secundária 12 m, primária 14 m)",
   "faixa_calcada_m": 2.5,

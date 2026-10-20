@@ -101,6 +101,9 @@ tr.sel { background: #fff5d6; }
 .opacity { margin-top: 6px; }
 .legend details { border: 0; padding: 0; margin: 0; }
 .legend summary { font-size: 12px; }
+.desenhando { cursor: crosshair; }
+.desenhando .leaflet-pane > svg path.leaflet-interactive { pointer-events: none !important; }
+.btn:disabled { opacity: .45; cursor: default; }
 .basemap { filter: grayscale(.85) brightness(1.05) contrast(.9); }
 
 .ficha { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; margin: 10px 0; }

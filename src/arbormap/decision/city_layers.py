@@ -48,15 +48,16 @@ def cloud_mask(img, static):
     return zeros | cold
 
 
-def dry_season_composite(city_dir, months=MESES_SECOS, max_cloud=0.03):
-    """Mediana das cenas limpas da estação seca. Devolve as bandas compostas e o registro."""
+def dry_season_composite(city_dir, months=MESES_SECOS, max_cloud=0.03, years=None):
+    """Mediana das cenas limpas da estação seca (opcionalmente só dos anos `years`).
+    Devolve as bandas compostas e o registro."""
     files = sorted(Path(city_dir).glob("*.npy"))
     static = static_nodata_mask(files)
     usable = ~static
     used, rejected, stack = [], [], []
     for f in files:
         mes = int(f.stem.split("_")[-1])
-        if mes not in months:
+        if mes not in months or (years is not None and int(f.stem.split("_")[0]) not in years):
             continue
         img = _load(f)
         cm = cloud_mask(img, static)
