@@ -33,16 +33,19 @@ PREMISSAS = {
 }
 
 
-# Referência de preço enquanto não houver a ata da SEMAM nem o SINAPI do Piauí: a página só a usa
-# se o gestor clicar em "usar referência"; os campos de custo começam vazios.
+# Referências de preço (SINAPI, Teresina) enquanto não houver a ata de registro de preços da SEMAM.
+# A página só as usa se o gestor clicar; os campos de custo começam vazios.
+# Conferência da 98510: 0,2117 h × 24,37 (jardineiro) + 1,0584 h × 23,66 (servente) + 85,05 (muda 358) = 115,25.
 CUSTOS_REFERENCIA = {
-    "plantio": {
-        "valor": 95.15,
-        "descricao": "SINAPI 98510: plantio de árvore ornamental com muda de até 2,00 m (muda de 1 m, jardineiro e servente; sem adubação)",
-        "base": "média nacional, 09/2026, não desonerado",
-        "fonte": "SINAPI (Caixa), composição consultada em orcamentor.com/composicao/98510",
-        "pendente": "confirmar o valor do Piauí na planilha SINAPI-PI ou usar a ata de registro de preços da SEMAM",
-    },
+    "fonte": "SINAPI (Caixa), planilha SINAPI_Referência_2026_09.xlsx, aba CSD, coluna PI (Teresina)",
+    "base": "09/2026, sem desoneração, emitida em 09/10/2026",
+    "observacao": "As composições não incluem adubação, tutor, protetor nem manutenção.",
+    "opcoes": [
+        {"codigo": "98510", "valor": 115.24,
+         "descricao": "plantio de árvore ornamental com muda de até 2,00 m (muda de 1 m: R$ 85,05; jardineiro 0,2117 h; servente 1,0584 h)"},
+        {"codigo": "98511", "valor": 209.23,
+         "descricao": "plantio de árvore ornamental com muda de 2,00 a 4,00 m (mais usual na arborização de ruas)"},
+    ],
 }
 
 

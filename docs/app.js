@@ -270,12 +270,16 @@ function iniciarControles() {
   $("#orc-slider").oninput = (e) => { S.orcArvores = +e.target.value; atualizarTudo(); };
   const num = (id, k) => { const el = $(id); el.value = S[k] ?? ""; el.oninput = () => { S[k] = el.value === "" ? null : +el.value; atualizarTudo(); }; };
   num("#custo-arvore", "custoArvore"); num("#custo-manut", "custoManut");
-  const ref = S.meta.custos_referencia?.plantio;
-  if (ref) {
-    $("#ref-custo").innerHTML = `Referência disponível: <b>R$ ${fmt(ref.valor, 2)}</b> por árvore. ${esc(ref.descricao)}; ${esc(ref.base)}. Fonte: ${esc(ref.fonte)}.
-      <span class="warn">Pendente: ${esc(ref.pendente)}.</span> A manutenção não tem referência e fica a informar.
-      <div style="margin-top:6px"><button class="btn ghost" id="usar-ref">Usar esta referência</button></div>`;
-    $("#usar-ref").onclick = () => { S.custoArvore = ref.valor; $("#custo-arvore").value = ref.valor; atualizarTudo(); };
+  const ref = S.meta.custos_referencia;
+  if (ref?.opcoes) {
+    $("#ref-custo").innerHTML = `<b>Referências do SINAPI para Teresina</b> (${esc(ref.base)}):` +
+      ref.opcoes.map((o, i) => `<div class="row" style="margin-top:6px"><span>SINAPI ${esc(o.codigo)}: <b>R$ ${fmt(o.valor, 2)}</b> por árvore, ${esc(o.descricao)}.</span>
+        <button class="btn ghost fix" data-ref="${i}">Usar</button></div>`).join("") +
+      `<p class="small">Fonte: ${esc(ref.fonte)}. ${esc(ref.observacao)} A ata de registro de preços da Prefeitura, se houver, deve substituir estes valores.</p>`;
+    $$("#ref-custo [data-ref]").forEach((b) => (b.onclick = () => {
+      const v = ref.opcoes[+b.dataset.ref].valor;
+      S.custoArvore = v; $("#custo-arvore").value = v; atualizarTudo();
+    }));
   }
   $("#m2-arvore").value = S.m2;
   $("#m2-arvore").oninput = (e) => { S.m2 = Math.max(4, +e.target.value || 36); atualizarTudo(); };
