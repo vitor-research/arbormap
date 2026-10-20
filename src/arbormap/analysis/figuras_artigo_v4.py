@@ -106,7 +106,7 @@ def fig_mapa_teresina(D, out):
         fig.colorbar(im, ax=a, orientation="horizontal", fraction=0.05, pad=0.02, shrink=0.85)
     fig.text(0.5, -0.03, f"Composição da estação seca (13 meses, 2018 a 2024), 123 bairros; MAE = {meta['mae_composicao_c']:.2f} °C, ".replace(".", ",") +
              f"correlação = {meta['pearson_composicao']:.2f}".replace(".", ",") + f". Em branco: sem LST observada no produto Landsat.", ha="center", fontsize=7.5)
-    salvar(fig, out, "Figura04_teresina_observado_previsto_erro.png")
+    salvar(fig, out, "Figura05_teresina_observado_previsto_erro.png")
 
 
 def fig_referencias(F, out):
@@ -121,7 +121,7 @@ def fig_referencias(F, out):
         ax.text(val + dp + 0.05, i, f"{val:.2f}".replace(".", ","), va="center", fontsize=8)
     ax.set_xlabel("MAE da anomalia de LST nas cidades de validação (°C)")
     ax.set_xlim(0, 3.4); ax.grid(axis="x", alpha=0.3)
-    salvar(fig, out, "Figura05_comparacao_referencias.png")
+    salvar(fig, out, "Figura04_comparacao_referencias.png")
 
 
 def fig_validacao_real(D, out):
