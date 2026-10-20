@@ -124,6 +124,11 @@ CONFIG_PADRAO = {
 # e exclusão dos pixels de LST zerada (lacunas de nuvem) do alvo.
 CONFIG_V2 = {"epochs": 40, "lr": 1e-4, "weight_decay": 0.05, "lst_min_valida": 1.0}
 
+# Versão oficial final: a v2 com 20 épocas fixas (escolhidas pelas curvas da v2), modelo da
+# última época e taxa de aprendizado ajustada pela perda de treino. As cidades de validação
+# não influenciam nem a escolha do checkpoint nem o agendamento da taxa de aprendizado.
+CONFIG_FINAL = {**CONFIG_V2, "epochs": 20, "selecao_epoca": "ultima", "scheduler_monitor": "train"}
+
 
 class _Tee:
     """Duplica o que é impresso para um arquivo de log."""
@@ -235,15 +240,16 @@ def _train_fold(fold, val_cities, train_cities, data_dir, valid_files_set, out_d
             "seconds": round(time.time() - t0, 1),
         }
         history.append(row)
-        scheduler.step(row["val_loss"])
+        scheduler.step(row["train_loss"] if cfg.get("scheduler_monitor") == "train" else row["val_loss"])
 
         print(f"Fold {fold + 1} | Epoch {row['epoch']:02d} | T.Loss: {row['train_loss']:.4f} | "
               f"V.Loss: {row['val_loss']:.4f} | MAE (°C): {row['mae_c']:.4f} | "
               f"HS MAE (°C): {row['hotspot_mae_c']:.4f} | IoU: {row['iou']:.4f} | "
               f"Std(Pred): {row['std_pred']:.4f} vs Std(Target): {row['std_target']:.4f} | {row['seconds']}s")
 
-        if row["val_loss"] < best_loss:
-            best_loss = row["val_loss"]
+        ultima = cfg.get("selecao_epoca") == "ultima"
+        if (ultima and row["epoch"] == cfg["epochs"]) or (not ultima and row["val_loss"] < best_loss):
+            best_loss = min(best_loss, row["val_loss"])
             torch.save({"state_dict": model.state_dict(), "mean": stats[0], "std": stats[1],
                         "fold": fold, "epoch": row["epoch"], "val_cities": val_cities,
                         "train_cities": train_cities, "base_c": cfg["base_c"],
@@ -253,8 +259,11 @@ def _train_fold(fold, val_cities, train_cities, data_dir, valid_files_set, out_d
                     "scheduler": scheduler.state_dict(), "history": history,
                     "best_loss": best_loss, "epoch": epoch}, ckpt_last)
 
-    best = min(history, key=lambda r: r["val_loss"])
-    result = {"fold": fold + 1, "val_cities": val_cities, "train_cities": train_cities,
+    if cfg.get("selecao_epoca") == "ultima":
+        best = history[-1]          # época fixa: nenhuma escolha feita com as cidades de validação
+    else:
+        best = min(history, key=lambda r: r["val_loss"])
+    result = {"fold": fold + 1, "selecao_epoca": cfg.get("selecao_epoca", "melhor_val"), "val_cities": val_cities, "train_cities": train_cities,
               "n_train_pairs": len(train_ds), "n_val_pairs": len(val_ds),
               "best_epoch": best["epoch"], "best": best, "history": history,
               "norm_mean": [float(v) for v in stats[0]], "norm_std": [float(v) for v in stats[1]]}
@@ -265,9 +274,9 @@ def _train_fold(fold, val_cities, train_cities, data_dir, valid_files_set, out_d
 
 
 def summarize(results, out_dir):
-    """Tabela 2: melhor época (menor V.Loss) de cada fold, média ± desvio-padrão amostral."""
+    """Tabela 2: época usada em cada fold (última, ou a de menor V.Loss), média ± DP amostral."""
     keys = [("val_loss", "Val. Loss"), ("mae_c", "MAE (°C)"), ("hotspot_mae_c", "Hotspot MAE (°C)"), ("iou", "IoU")]
-    lines = ["Fold;Cidades de validação;Melhor época;" + ";".join(k[1] for k in keys)]
+    lines = ["Fold;Cidades de validação;Época;" + ";".join(k[1] for k in keys)]
     for r in results:
         lines.append(f"{r['fold']};{', '.join(r['val_cities'])};{r['best_epoch']};"
                      + ";".join(f"{r['best'][k]:.4f}" for k, _ in keys))
@@ -282,7 +291,9 @@ def summarize(results, out_dir):
     (out_dir / "resultados_kfold.json").write_text(
         json.dumps({"folds": [{k: v for k, v in r.items() if k != "history"} for r in results],
                     "resumo": summary}, indent=2, ensure_ascii=False), encoding="utf-8")
-    print("\n" + "=" * 70 + "\nTABELA 2 (melhor época por fold)\n" + "=" * 70)
+    modo = results[0].get("selecao_epoca", "melhor_val") if results else "melhor_val"
+    titulo = "época fixa (última)" if modo == "ultima" else "melhor época por fold"
+    print("\n" + "=" * 70 + f"\nTABELA 2 ({titulo})\n" + "=" * 70)
     for line in lines:
         print(line.replace(";", " | "))
     return summary

@@ -145,6 +145,75 @@ def select_clear_dry_pair(data_dir, city, valid_files_set, dry_months=(6, 7, 8, 
     return chosen["indice"], rows
 
 
+def cloud_score(path):
+    """Fração da cena com sinal de nuvem: LST zerada (lacuna) ou mancha fria em terra firme.
+
+    Mancha fria: pixel fora da água (NDWI < 0,1) com LST abaixo de mediana − 3 × DP robusto
+    (1,4826 × desvio absoluto mediano) da terra firme da própria cena.
+    """
+    img = ensure_channels_first(np.load(path).astype(np.float32))
+    lst, ndwi = img[CH_LST], img[CH_NDWI]
+    zeros = lst <= 1.0
+    land = (ndwi < 0.1) & ~zeros
+    vals = lst[land]
+    med = float(np.median(vals)) if vals.size else 0.0
+    mad = float(np.median(np.abs(vals - med))) * 1.4826 if vals.size else 0.0
+    cold = land & (lst < med - 3 * mad)
+    return {"nuvem": float((zeros | cold).mean()), "zerados": float(zeros.mean()), "frios": float(cold.mean())}
+
+
+def select_recent_clear_pair(data_dir, city, valid_files_set, quantil=0.3):
+    """Par mais recente cujas duas cenas estão entre as mais limpas da cidade.
+
+    Percorre os pares do mais recente para o mais antigo e escolhe o primeiro em que o escore
+    de nuvem da cena-base e da cena-alvo é no máximo o quantil `quantil` dos escores da cidade.
+    Devolve o índice e a tabela de todos os pares (para registro e para a prancha).
+    """
+    ds = UrbanHeatDataset(data_dir, allowed_cities=[city], valid_files_set=valid_files_set, normalize=False)
+    cache = {}
+    def score(p):
+        if p not in cache:
+            cache[p] = cloud_score(p)
+        return cache[p]
+    rows = []
+    for i, (b, t) in enumerate(ds.samples):
+        sb, st = score(b), score(t)
+        rows.append({"indice": i, "base": Path(b).name, "alvo": Path(t).name,
+                     "nuvem_base": sb["nuvem"], "nuvem_alvo": st["nuvem"],
+                     "zerados_alvo": st["zerados"], "frios_alvo": st["frios"]})
+    thr = float(np.quantile([v["nuvem"] for v in cache.values()], quantil))
+    chosen = next((r for r in reversed(rows) if r["nuvem_base"] <= thr and r["nuvem_alvo"] <= thr), None)
+    if chosen is None:   # nenhum par abaixo do limiar: o de menor escore de nuvem
+        chosen = min(rows, key=lambda r: max(r["nuvem_base"], r["nuvem_alvo"]))
+    for r in rows:
+        r["limiar"] = thr
+        r["escolhido"] = r["indice"] == chosen["indice"]
+    return chosen["indice"], rows
+
+
+def figure_scene_sheet(data_dir, city, rows, save_path, n=12):
+    """Prancha com a LST-alvo dos `n` pares mais recentes, escore de nuvem e o par escolhido."""
+    sel = rows[-n:]
+    cols = 4
+    lines = int(np.ceil(len(sel) / cols))
+    fig, axes = plt.subplots(lines, cols, figsize=(4 * cols, 4 * lines), squeeze=False)
+    for ax in axes.flat:
+        ax.set_axis_off()
+    for ax, r in zip(axes.flat, reversed(sel)):
+        lst = ensure_channels_first(np.load(Path(data_dir) / city / r["alvo"]).astype(np.float32))[CH_LST]
+        show = np.where(lst <= 1.0, np.nan, lst)
+        lo, hi = np.nanpercentile(show, [2, 98])
+        ax.imshow(show, cmap="inferno", vmin=lo, vmax=hi)
+        ok = r["nuvem_base"] <= r["limiar"] and r["nuvem_alvo"] <= r["limiar"]
+        cor = "green" if r["escolhido"] else ("black" if ok else "red")
+        ax.set_title(f"{r['base'][:7]} → {r['alvo'][:7]}\nnuvem base {r['nuvem_base']:.1%} | alvo {r['nuvem_alvo']:.1%}"
+                     + ("\nESCOLHIDO" if r["escolhido"] else ""), fontsize=9, color=cor)
+    fig.suptitle(f"{city}: pares mais recentes (vermelho = acima do limiar de nuvem {sel[0]['limiar']:.1%})", fontsize=11)
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=120, bbox_inches="tight")
+    plt.close()
+
+
 def predict_celsius(model, x, std_ref, mean_ref):
     with torch.no_grad():
         z = model(x)
@@ -351,10 +420,14 @@ def run_city(model, ckpt_state, data_dir, valid_files_set, city="Teresina", pair
             rand_vals.append(avg)
             if cool_rand is None:
                 cool_rand, m_rand = cool, m
+        benef = lambda cool: float(((cool > 0.1) & valid).sum() * PIXEL_HA)
         row = {"budget_px": int(b), "area_ha": round(b * PIXEL_HA, 2),
                "multi_c": avg_multi, "multi_px_selecionados": int(m_multi.sum()),
                "gulosa_c": avg_greedy,
-               "aleatoria_c_media": float(np.mean(rand_vals)), "aleatoria_c_dp": float(np.std(rand_vals, ddof=1))}
+               "aleatoria_c_media": float(np.mean(rand_vals)), "aleatoria_c_dp": float(np.std(rand_vals, ddof=1)),
+               # área com resfriamento > 0,1 °C (plantio + vizinhança), em hectares
+               "multi_area_beneficiada_ha": benef(cool_multi), "gulosa_area_beneficiada_ha": benef(cool_greedy),
+               "aleatoria_area_beneficiada_ha": benef(cool_rand)}
         curve.append(row)
         print(f"   Orçamento {b:3d} px ({row['area_ha']:.2f} ha): Multi {avg_multi:.2f} °C | "
               f"Gulosa {avg_greedy:.2f} °C | Aleatória {row['aleatoria_c_media']:.2f} ± {row['aleatoria_c_dp']:.2f} °C")
@@ -448,16 +521,27 @@ def figure_budget_curve(res, save_path):
     b = [r["budget_px"] for r in c]
     rm = np.array([r["aleatoria_c_media"] for r in c])
     rs = np.array([r["aleatoria_c_dp"] for r in c])
-    plt.figure(figsize=(8, 5))
-    plt.plot(b, [r["multi_c"] for r in c], marker="o", color="#10b981", linewidth=2.5, label="Multicritério (proposto)")
-    plt.plot(b, [r["gulosa_c"] for r in c], marker="s", linestyle="--", color="#ef4444", linewidth=2, label="Gulosa")
-    plt.plot(b, rm, marker="^", linestyle=":", color="#6b7280", linewidth=2, label="Aleatória (média)")
-    plt.fill_between(b, rm - rs, rm + rs, color="#6b7280", alpha=0.15, label="Aleatória (±1 DP)")
-    plt.title("Eficiência de resfriamento vs. orçamento de intervenção", fontsize=12, fontweight="bold")
-    plt.xlabel("Orçamento (pixels de 900 m²)")
-    plt.ylabel("Redução média de LST nos pixels plantados (°C)")
-    plt.grid(True, linestyle="--", alpha=0.5)
-    plt.legend(frameon=True)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+    ax1.plot(b, [r["multi_c"] for r in c], marker="o", color="#10b981", linewidth=2.5, label="Multicritério (proposto)")
+    ax1.plot(b, [r["gulosa_c"] for r in c], marker="s", linestyle="--", color="#ef4444", linewidth=2, label="Gulosa")
+    ax1.plot(b, rm, marker="^", linestyle=":", color="#6b7280", linewidth=2, label="Aleatória (média)")
+    ax1.fill_between(b, rm - rs, rm + rs, color="#6b7280", alpha=0.15, label="Aleatória (±1 DP)")
+    ax1.set_title("(a) Redução média de LST nos pixels plantados", fontweight="bold")
+    ax1.set_xlabel("Orçamento (pixels de 900 m²)")
+    ax1.set_ylabel("ΔT (°C)")
+    ax1.grid(True, linestyle="--", alpha=0.5)
+    ax1.legend(frameon=True)
+    if "multi_area_beneficiada_ha" in c[0]:
+        ax2.plot(b, [r["multi_area_beneficiada_ha"] for r in c], marker="o", color="#10b981", linewidth=2.5, label="Multicritério (proposto)")
+        ax2.plot(b, [r["gulosa_area_beneficiada_ha"] for r in c], marker="s", linestyle="--", color="#ef4444", linewidth=2, label="Gulosa")
+        ax2.plot(b, [r["aleatoria_area_beneficiada_ha"] for r in c], marker="^", linestyle=":", color="#6b7280", linewidth=2, label="Aleatória (1 sorteio)")
+        ax2.set_title("(b) Área com resfriamento > 0,1 °C (plantio + vizinhança)", fontweight="bold")
+        ax2.set_xlabel("Orçamento (pixels de 900 m²)")
+        ax2.set_ylabel("Área beneficiada (ha)")
+        ax2.grid(True, linestyle="--", alpha=0.5)
+        ax2.legend(frameon=True)
+    else:
+        ax2.set_axis_off()
     plt.tight_layout()
     plt.savefig(save_path, dpi=300, bbox_inches="tight")
     plt.close()
