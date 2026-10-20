@@ -1,0 +1,44 @@
+body.plano { display: block; height: auto; background: var(--bg); }
+.plano-topo { position: sticky; top: 0; display: flex; align-items: center; gap: 16px; padding: 12px 24px; background: var(--panel); border-bottom: 1px solid var(--line); z-index: 10; }
+.plano-topo h1 { font-size: 18px; margin: 0; }
+.plano-topo h1 span { color: var(--accent); }
+.plano-topo .sub { font-size: 12px; color: var(--muted); }
+.plano-topo .acoes { margin-left: auto; display: flex; gap: 8px; }
+.plano-topo a.btn { text-decoration: none; display: inline-block; }
+.plano-corpo { max-width: 1080px; margin: 0 auto; padding: 20px 24px 60px; }
+.plano-corpo section { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; margin: 16px 0; break-inside: avoid-page; }
+.plano-corpo h2 { font-size: 17px; margin: 0 0 10px; }
+.plano-corpo h3 { margin-top: 16px; }
+.plano-corpo p, .plano-corpo li { font-size: 14px; line-height: 1.55; }
+.plano-corpo .cards { grid-template-columns: repeat(4, 1fr); }
+.plano-corpo .card .v { font-size: 22px; }
+.mapa-print { width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); display: block; }
+.legenda-print { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 6px; align-items: center; }
+.legenda-print .bar { width: 160px; height: 10px; border-radius: 3px; display: inline-block; vertical-align: middle; }
+.premissa { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; margin: 4px 14px 4px 0; }
+.premissa input { width: 64px; padding: 4px 6px; }
+.cenarios td.rec { background: var(--accent-soft); }
+.tag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 999px; margin: 1px 2px; background: var(--bg); color: var(--muted); }
+.tag.caatinga { background: #f6ecd8; color: #8a5a00; }
+.tag.cerrado { background: #e9f0d8; color: #4f6a12; }
+.tag.mata { background: #dcefe4; color: #1d6b35; }
+.especies { columns: 2; column-gap: 28px; font-size: 13px; padding-left: 18px; }
+.especies li { break-inside: avoid; margin: 3px 0; }
+.colunas { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.plano-corpo table { font-size: 12.5px; }
+.plano-corpo .tablewrap { max-height: none; }
+.aviso { border-left: 3px solid var(--warn); background: #fdf6e8; padding: 8px 12px; border-radius: 6px; font-size: 13px; }
+@media (max-width: 760px) {
+  .plano-corpo { padding: 12px 16px 40px; }
+  .plano-corpo .cards { grid-template-columns: 1fr 1fr; }
+  .colunas { grid-template-columns: 1fr; }
+  .especies { columns: 1; }
+  .plano-topo { padding: 10px 16px; flex-wrap: wrap; }
+}
+@media print {
+  .plano-topo .acoes, .premissa input { display: none; }
+  .plano-topo { position: static; }
+  body.plano { background: #fff; }
+  .plano-corpo section { border: 0; padding: 0; margin: 18px 0; }
+  .chartbox { height: 220px; }
+}

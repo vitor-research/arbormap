@@ -88,6 +88,90 @@ class Simulador:
         }
 
 
+    def potencial(self, valid):
+        return cooling_potential(self.model, self.x, torch.from_numpy(valid[None, None].astype(np.float32)), self.sig,
+                                 self.stats, self.sd, self.mu)
+
+
+class SimuladorJanelas(Simulador):
+    """Para grades maiores que o recorte de treino (400 px): cada área é simulada na janela de
+    400 × 400 px centrada nela (o modelo sempre vê uma cena do tamanho do treino); a anomalia vira
+    °C com o DP da LST observada da janela, como em city_layers.predict_windowed."""
+
+    def __init__(self, L, meta, ckpt, win=400, passo=50, device="cpu"):
+        from arbormap.decision.city_layers import windowed_input
+        self.L, self.win, self.passo = L, win, passo
+        self.model, st = load_model(ckpt, device)
+        self.stats = (np.asarray(st["mean"]), np.asarray(st["std"]))
+        comp = np.stack([L["ndvi"], L["ndwi"], L["ndbi"], L["dem"], L["lst_obs"]]).astype(np.float32)
+        self.xfull = windowed_input(comp, self.stats)
+        self.obs = L["lst_obs"]
+        self.valid = np.isfinite(L["lst_pred"])
+        self.base = L["lst_pred"]
+        self.H, self.W = self.valid.shape
+        veg = self.valid & (L["ndvi"] >= NDVI_VEG_DENSA)
+        self.sig = {c: float(np.nanmedian(L[k][veg])) for c, k in ((CH_NDVI, "ndvi"), (CH_NDBI, "ndbi"), (CH_NDWI, "ndwi"))}
+        self.n_veg = int(veg.sum())
+        self.mu, self.sd = meta["lst_media_composicao_c"], meta["lst_dp_composicao_c"]
+        self._cache = {}
+
+    def janela(self, mask):
+        ys, xs = np.where(mask)
+        cy, cx = (ys.min() + ys.max()) / 2, (xs.min() + xs.max()) / 2
+        y0 = int(np.clip(round((cy - self.win / 2) / self.passo) * self.passo, 0, max(0, self.H - self.win)))
+        x0 = int(np.clip(round((cx - self.win / 2) / self.passo) * self.passo, 0, max(0, self.W - self.win)))
+        return y0, x0
+
+    def _z(self, x):
+        with torch.no_grad():
+            return self.model(torch.from_numpy(x[None]).float())[0, 0].numpy()
+
+    def _base(self, y0, x0):
+        k = (y0, x0)
+        if k not in self._cache:
+            w = self.win
+            o = self.obs[y0:y0 + w, x0:x0 + w]
+            self._cache[k] = (self._z(self.xfull[:, y0:y0 + w, x0:x0 + w]), float(np.nanstd(o)))
+        return self._cache[k]
+
+    def effect(self, frac):
+        m = frac > 0
+        y0, x0 = self.janela(m)
+        w = self.win
+        zb, sd = self._base(y0, x0)
+        xw = self.xfull[:, y0:y0 + w, x0:x0 + w].copy()
+        f = frac[y0:y0 + w, x0:x0 + w]
+        mean, std = self.stats
+        for c, v in self.sig.items():
+            k = MODEL_CH[c]
+            xw[k] = xw[k] + f * (float((v - mean[c]) / (std[c] + 1e-6)) - xw[k])
+        za = self._z(xw)
+        cool = np.zeros((self.H, self.W), np.float32)
+        cool[y0:y0 + w, x0:x0 + w] = advected_cooling(zb * sd, za * sd)
+        wts = frac[m]
+        return cool, {
+            "resfriamento_c": float((cool[m] * wts).sum() / max(wts.sum(), 1e-9)),
+            "area_05c_ha": float(((cool >= 0.5) & self.valid).sum() * PIXEL_HA),
+            "resfriamento_int": float(np.clip(cool[self.valid], 0, None).sum() * PIXEL_HA),
+        }
+
+    def potencial(self, valid, passo=200):
+        from arbormap.decision.city_layers import _janelas, _peso
+        w = self.win
+        acc = np.zeros((self.H, self.W), np.float32); ws = np.zeros_like(acc)
+        pw = _peso(w)
+        for y0 in _janelas(self.H, w, passo):
+            for x0 in _janelas(self.W, w, passo):
+                o = self.obs[y0:y0 + w, x0:x0 + w]
+                if np.isfinite(o).mean() < 0.2:
+                    continue
+                xw = torch.from_numpy(self.xfull[:, y0:y0 + w, x0:x0 + w][None]).float()
+                vw = torch.from_numpy(valid[y0:y0 + w, x0:x0 + w][None, None].astype(np.float32))
+                p = cooling_potential(self.model, xw, vw, self.sig, self.stats, float(np.nanstd(o)), float(np.nanmean(o)))
+                acc[y0:y0 + w, x0:x0 + w] += p * pw; ws[y0:y0 + w, x0:x0 + w] += pw
+        return np.where(ws > 0, acc / np.maximum(ws, 1e-6), 0).astype(np.float32)
+
+
 def _components(mask, min_px=3):
     n, lab, st, _ = cv2.connectedComponentsWithStats(mask.astype(np.uint8), connectivity=8)
     return [lab == i for i in range(1, n) if st[i, cv2.CC_STAT_AREA] >= min_px]
@@ -121,14 +205,15 @@ def _pix_to_lonlat(ys, xs, bounds, shape):
     return w + (xs + 0.5) * (e - w) / wd, n - (ys + 0.5) * (n - s) / h
 
 
-def gerar(L, meta, ckpt, fr, bairro_ids, bairros_nomes, bounds, osm_dir, max_por_tipo=None, log=print):
+def gerar(L, meta, ckpt, fr, bairro_ids, bairros_nomes, bounds, osm_dir, max_por_tipo=None, alvos=None, log=print):
     max_por_tipo = max_por_tipo or {"praca": 200, "calcada": 160, "livre": 100}
-    sim = Simulador(L, meta, ckpt)
-    log(f"assinatura de vegetação (n={sim.n_veg}): {sim.sig}")
+    alvos = alvos or {"calcada": 2500, "livre": 1500}
+    grande = max(L["lst_pred"].shape) > 400
+    sim = SimuladorJanelas(L, meta, ckpt) if grande else Simulador(L, meta, ckpt)
+    log(f"assinatura de vegetação (n={sim.n_veg}): {sim.sig}{' | simulação por janelas de 400 px' if grande else ''}")
     valid = sim.valid & (L["artefato_fixo"] < 0.5)
     ndvi = L["ndvi"]
-    pot = cooling_potential(sim.model, sim.x, torch.from_numpy(valid[None, None].astype(np.float32)), sim.sig,
-                            sim.stats, sim.sd, sim.mu)
+    pot = sim.potencial(valid)
     candidatos = []
 
     # praças/parques
@@ -136,7 +221,7 @@ def gerar(L, meta, ckpt, fr, bairro_ids, bairros_nomes, bounds, osm_dir, max_por
     for comp in sorted(_components(m_praca, 2), key=lambda c: -fr["praca"][c].sum())[:max_por_tipo["praca"]]:
         candidatos.append(("praca", comp, fr["praca"] * comp))
     # calçadas e lotes: corredores pelo escore multicritério
-    for tipo, chave, alvo in (("calcada", "calcada", 2500), ("livre", "outros", 1500)):
+    for tipo, chave, alvo in (("calcada", "calcada", alvos["calcada"]), ("livre", "outros", alvos["livre"])):
         plant = valid & (fr[chave] > 0.08) & (ndvi < NDVI_MAX_PLANTIO)
         score = multicriteria_score(pot, sim.base, plant, {"peso_potencial": 0.6, "peso_urgencia": 0.4})
         cors, _ = build_corridors(score, plant, {"area_alvo_candidatos_px": alvo, "min_px_corredor": 4,
@@ -185,11 +270,22 @@ def vincular_equipamentos(feats, eq):
 
 def teste_aditividade(sim, candidatos, feats, n=20):
     """Compara o efeito de n áreas plantadas juntas com a soma dos efeitos individuais."""
-    order = sorted(range(len(feats)), key=lambda i: -feats[i]["properties"]["resfriamento_int"])[:n]
+    order = sorted(range(len(feats)), key=lambda i: -feats[i]["properties"]["resfriamento_int"])
+    if isinstance(sim, SimuladorJanelas):
+        # todas as áreas do teste precisam caber na mesma janela de 400 px
+        y0, x0 = sim.janela(candidatos[order[0]][1])
+        dentro = lambda m: (lambda ys, xs: ys.min() >= y0 and ys.max() < y0 + sim.win and xs.min() >= x0 and xs.max() < x0 + sim.win)(*np.where(m))
+        order = [i for i in order if dentro(candidatos[i][1])]
+        _janela_fixa = (y0, x0)
+        sim.janela = lambda m, j=_janela_fixa: j
+    order = order[:n]
     frac = np.zeros_like(candidatos[0][2])
     for i in order:
         frac = np.maximum(frac, candidatos[i][2])
     _, ef = sim.effect(frac)
-    soma = sum(feats[i]["properties"]["resfriamento_int"] for i in order)
-    return {"n_areas": n, "integral_conjunto": round(ef["resfriamento_int"], 2), "soma_individuais": round(soma, 2),
+    # os individuais são recalculados na mesma janela do conjunto, para comparar a mesma conta
+    soma = sum(sim.effect(candidatos[i][2])[1]["resfriamento_int"] for i in order)
+    if isinstance(sim, SimuladorJanelas):
+        del sim.janela
+    return {"n_areas": len(order), "integral_conjunto": round(ef["resfriamento_int"], 2), "soma_individuais": round(soma, 2),
             "razao_conjunto_soma": round(ef["resfriamento_int"] / max(soma, 1e-9), 3)}

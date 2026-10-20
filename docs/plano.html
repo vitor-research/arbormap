@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plano de Arborização</title>
+<meta name="description" content="Plano de arborização gerado pelo ARBORMAP para Teresina (PI): áreas, custos, efeito no calor ao longo do tempo, espécies nativas e cenários.">
+<link rel="stylesheet" href="style.css?v=9">
+<link rel="stylesheet" href="plano.css?v=9">
+</head>
+<body class="plano">
+<header class="plano-topo">
+  <div>
+    <h1>ARBOR<span>MAP</span> · Plano de arborização</h1>
+    <div class="sub" id="p-sub">Teresina (PI)</div>
+  </div>
+  <div class="acoes">
+    <button class="btn ghost" onclick="window.print()">Imprimir</button>
+    <a class="btn ghost" id="p-voltar" href="index.html">Voltar ao mapa</a>
+  </div>
+</header>
+<main class="plano-corpo" id="p-corpo">
+  <p id="p-carregando">Carregando o plano...</p>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="plano.js?v=9"></script>
+</body>
+</html>

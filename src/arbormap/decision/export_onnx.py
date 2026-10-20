@@ -24,7 +24,7 @@ import onnx
 import torch
 from onnx import helper, numpy_helper
 
-from arbormap.decision.areas_candidatas import NDVI_MAX_PLANTIO, Simulador
+from arbormap.decision.areas_candidatas import NDVI_MAX_PLANTIO, Simulador, SimuladorJanelas
 from arbormap.decision.simulate_urbanheatnet import MODEL_CH, PIXEL_HA, slope_degrees
 
 CLASSES = ("praca", "calcada", "outros")
@@ -49,14 +49,22 @@ def pesos_fp16(model_proto, min_size=1024):
 def exportar(L, meta, ckpt, fr, out_dir):
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    sim = Simulador(L, meta, ckpt)
+    grande = max(L["lst_pred"].shape) > 400
+    sim = SimuladorJanelas(L, meta, ckpt) if grande else Simulador(L, meta, ckpt)
+    x_exemplo = torch.from_numpy(sim.xfull[None, :, :400, :400].copy()).float() if grande else sim.x
     tmp = out / "_tmp_fp32.onnx"
-    torch.onnx.export(sim.model, sim.x, str(tmp), input_names=["x"], output_names=["y"], opset_version=17, dynamo=False)
+    torch.onnx.export(sim.model, x_exemplo, str(tmp), input_names=["x"], output_names=["y"], opset_version=17, dynamo=False)
     m = pesos_fp16(onnx.load(str(tmp)))
     tmp.unlink()
     (out / "urbanheatnet_fp16.onnx").write_bytes(m.SerializeToString())
 
-    sim.x.numpy().astype("<f4").tofile(out / "entrada.bin")
+    if grande:
+        # entrada e LST observada em float16 (metade do download); o navegador recorta a janela
+        sim.xfull.astype("<f2").tofile(out / "entrada_f16.bin")
+        L["lst_obs"].astype("<f2").tofile(out / "lst_obs_f16.bin")
+        (out / "entrada.bin").unlink(missing_ok=True)
+    else:
+        sim.x.numpy().astype("<f4").tofile(out / "entrada.bin")
     dem = np.where(np.isfinite(L["dem"]), L["dem"], np.nanmedian(L["dem"]))
     pode = (sim.valid & (L["artefato_fixo"] < 0.5) & (L["ndvi"] < NDVI_MAX_PLANTIO)
             & (L["ndwi"] < 0.1) & (slope_degrees(dem) <= 15))
@@ -64,7 +72,9 @@ def exportar(L, meta, ckpt, fr, out_dir):
     sim.valid.astype(np.uint8).tofile(out / "valido.bin")
     mean, std = sim.stats
     alvo = {str(MODEL_CH[c]): float((v - mean[c]) / (std[c] + 1e-6)) for c, v in sim.sig.items()}
-    info = {"shape": list(sim.x.shape), "alvo_normalizado": alvo, "lst_media_c": sim.mu, "lst_dp_c": sim.sd,
+    shape = [1, 4, *sim.valid.shape]
+    info = {"shape": shape, "janela": 400 if grande else None, "passo": 50 if grande else None, "formato_entrada": "f16" if grande else "f32",
+            "alvo_normalizado": alvo, "lst_media_c": sim.mu, "lst_dp_c": sim.sd,
             "pixel_ha": PIXEL_HA, "classes": list(CLASSES), "ndvi_max_plantio": NDVI_MAX_PLANTIO,
             "modelo": Path(ckpt).name}
     (out / "sim.json").write_text(json.dumps(info, indent=1), encoding="utf-8")

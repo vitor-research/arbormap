@@ -43,7 +43,7 @@ const S = {
   meta: null, bairros: null, areas: [], equip: [],
   estrategia: "eficiencia", orcArvores: 0, unidade: "arvores",
   tipos: new Set(["praca", "calcada"]), bairro: "", filtroEquip: false, dist: 300, filtroInc: false,
-  custoArvore: null, custoManut: null, m2: 36, manual: new Set(),
+  custoArvore: null, custoManut: null, porte: "misto", manual: new Set(),
   pesoCalor: 0.6, metrica: "indice", sortB: { k: "indice", asc: false }, bairroSel: null,
   modo: "gestor", aba: "planejar",
 };
@@ -106,7 +106,19 @@ function calcularIndice() {
 }
 
 /* ---------------- plano ---------------- */
-const arvoresDe = (p) => Math.max(1, Math.round((p.area_plantavel_ha * 10000) / S.m2));
+// Espaçamento mínimo por porte: Manual de Arborização Urbana de Fortaleza (2020, p. 68)
+const ESPAC = { pequeno: 5, medio: 8, grande: 12 };
+const FAIXA_CALCADA_M = 2.5;
+function porteDe(tipo, porte = S.porte) {
+  if (tipo === "calcada") return porte === "pequeno" || porte === "misto" ? "pequeno" : "medio";
+  return porte === "misto" ? "medio" : porte;
+}
+function arvoresPorHa(tipo, porte = S.porte) {
+  const s = ESPAC[porteDe(tipo, porte)];
+  return tipo === "calcada" ? 10000 / (FAIXA_CALCADA_M * s) : 10000 / (s * s);
+}
+const arvoresDe = (p, porte) => Math.max(1, Math.round(p.area_plantavel_ha * arvoresPorHa(p.tipo, porte)));
+const arvoresPorHaMedia = () => { const f = areasFiltradas(); const ha = f.reduce((s, a) => s + a.properties.area_plantavel_ha, 0); return ha ? f.reduce((s, a) => s + arvoresDe(a.properties), 0) / ha : 150; };
 const custoUnit = () => (S.custoArvore || 0) + (S.custoManut || 0);
 
 function areasFiltradas() {
@@ -264,7 +276,7 @@ function iniciarControles() {
   $("#orc-unidade").onchange = (e) => { S.unidade = e.target.value; atualizarTudo(); };
   $("#orc-valor").oninput = (e) => {
     const v = +e.target.value || 0;
-    S.orcArvores = S.unidade === "arvores" ? v : S.unidade === "ha" ? Math.round((v * 10000) / S.m2) : custoUnit() ? Math.floor(v / custoUnit()) : 0;
+    S.orcArvores = S.unidade === "arvores" ? v : S.unidade === "ha" ? Math.round(v * arvoresPorHaMedia()) : custoUnit() ? Math.floor(v / custoUnit()) : 0;
     atualizarTudo(false);
   };
   $("#orc-slider").oninput = (e) => { S.orcArvores = +e.target.value; atualizarTudo(); };
@@ -281,8 +293,8 @@ function iniciarControles() {
       S.custoArvore = v; $("#custo-arvore").value = v; atualizarTudo();
     }));
   }
-  $("#m2-arvore").value = S.m2;
-  $("#m2-arvore").oninput = (e) => { S.m2 = Math.max(4, +e.target.value || 36); atualizarTudo(); };
+  $("#porte").value = S.porte;
+  $("#porte").onchange = (e) => { S.porte = e.target.value; atualizarTudo(); };
 
   $$("input[name=estr]").forEach((r) => { r.checked = r.value === S.estrategia; r.onchange = () => {
     if (r.value === "manual" && !S.manual.size) S.manual = new Set(planoAtual);
@@ -295,6 +307,7 @@ function iniciarControles() {
   $("#f-equip").checked = S.filtroEquip; $("#f-equip").onchange = (e) => { S.filtroEquip = e.target.checked; atualizarTudo(); };
   $("#f-dist").value = S.dist; $("#f-dist").oninput = (e) => { S.dist = +e.target.value || 300; atualizarTudo(); };
   $("#f-incerteza").checked = S.filtroInc; $("#f-incerteza").onchange = (e) => { S.filtroInc = e.target.checked; atualizarTudo(); };
+  $("#btn-gerar").onclick = () => gerarPlano("plano");
   $("#btn-link").onclick = () => {
     escreverHash();
     navigator.clipboard?.writeText(location.href).then(() => ($("#link-ok").textContent = "Link copiado."), () => ($("#link-ok").textContent = "Copie o endereço da barra do navegador."));
@@ -354,7 +367,7 @@ function atualizarTudo(reescreverValor = true) {
   sl.disabled = S.estrategia === "manual";
   $("#orc-valor").disabled = S.estrategia === "manual";
   if (reescreverValor) {
-    const v = S.unidade === "arvores" ? S.orcArvores : S.unidade === "ha" ? (S.orcArvores * S.m2) / 10000 : custoUnit() ? S.orcArvores * custoUnit() : "";
+    const v = S.unidade === "arvores" ? S.orcArvores : S.unidade === "ha" ? S.orcArvores / arvoresPorHaMedia() : custoUnit() ? S.orcArvores * custoUnit() : "";
     $("#orc-valor").value = v === "" ? "" : S.unidade === "ha" ? (+v).toFixed(1) : Math.round(v);
   }
   const av = $("#orc-aviso");
@@ -443,7 +456,9 @@ function atualizarBairros() {
   }).join("");
   $$("#tab-bairros-t tbody tr").forEach((tr) => (tr.onclick = () => selecionarBairro(tr.dataset.cd, true)));
   const b = S.meta.bairros;
-  $("#b-cobertura").textContent = `${b.n_com_metricas} de ${b.n_bairros} bairros têm ao menos ${Math.round(b.cobertura_minima * 100)}% da área coberta pela imagem de satélite usada; os demais aparecem sem métricas de temperatura. Ilha de calor: pixels acima de ${fmt(b.lst_p90_c, 1)} °C (10% mais quentes da cidade).`;
+  $("#b-cobertura").textContent = (b.n_com_metricas < b.n_bairros
+    ? `${b.n_com_metricas} de ${b.n_bairros} bairros têm ao menos ${Math.round(b.cobertura_minima * 100)}% da área coberta pela imagem de satélite usada; os demais aparecem sem métricas de temperatura.`
+    : `Todos os ${b.n_bairros} bairros estão cobertos pela imagem de satélite.`) + ` Ilha de calor: pixels acima de ${fmt(b.lst_p90_c, 1)} °C (10% mais quentes da cidade).`;
   if (S.bairroSel && S.modo === "gestor") fichaBairro(S.bairroSel);
 }
 function bairroPorCd(cd) { return S.bairros.features.find((f) => f.properties.cd_bairro === cd); }
@@ -535,11 +550,33 @@ function preencherConfiabilidade() {
     m.validacao_real ? `Nos parques que já existem, o modelo previu mais frescor do que o satélite mede (${fmt(m.validacao_real.parques.pred_media_c, 2)} °C × ${fmt(m.validacao_real.parques.obs_media_c, 2)} °C em média): os valores simulados são um limite superior.` : null,
     "O espaço para plantio foi estimado com mapas abertos (OpenStreetMap e Overture). Fiação, largura real da calçada, tubulações e propriedade dos lotes precisam ser verificadas em campo.",
     ad ? `Áreas vizinhas não somam integralmente: plantando juntas as ${ad.n_areas} áreas de maior efeito, o resultado foi ${fmt(ad.razao_conjunto_soma * 100)}% da soma dos efeitos individuais; os totais do plano usam essa razão.` : null,
-    `A imagem cobre ${m.bairros.n_com_metricas} dos ${m.bairros.n_bairros} bairros; o restante será incluído numa próxima versão.`,
+    m.bairros.n_com_metricas < m.bairros.n_bairros
+      ? `A imagem cobre ${m.bairros.n_com_metricas} dos ${m.bairros.n_bairros} bairros; o restante será incluído numa próxima versão.`
+      : `A imagem cobre todos os ${m.bairros.n_bairros} bairros. A temperatura "acima da média" é em relação à média de toda a área mapeada, que inclui as bordas rurais e os rios. Em parte do nordeste da área, o produto de temperatura do Landsat não tem dado observado; ali o mapa mostra só a previsão do modelo.`,
+    "O modelo foi validado no recorte de 12 km do centro (testes acima); a área ampliada usa o mesmo modelo em janelas de 12 km, o tamanho de cena do treino.",
     "Áreas hachuradas no mapa (água, encostas e falhas fixas do dado de satélite) não recebem previsão nem plantio.",
   ].filter(Boolean).map((t) => `<li>${t}</li>`).join("");
 }
+function preencherInmet() {
+  const i = S.meta.validacao_inmet;
+  if (!i) { $("#valid-inmet").style.display = "none"; return; }
+  $("#vi-texto").innerHTML = `O satélite mede a temperatura da <b>superfície</b> (chão, telhados, copas), não a do ar. Na estação automática do INMET em Teresina (A312), comparamos as duas no horário da passagem do satélite (cerca de 10h) em ${i.n_dias} dias sem nuvens, de ${i.periodo[0].slice(0, 4)} a ${i.periodo[1].slice(0, 4)}.
+    Elas sobem e descem juntas (correlação ${fmt(i.pearson_lst_estacao_x_ar, 2)}), mas na estação seca a superfície fica em média <b>${fmt(i.lst_menos_ar_seca_c, 1)} °C acima do ar</b> (${fmt(i.media_seca.lst, 1)} × ${fmt(i.media_seca.ar, 1)} °C); na chuvosa, as duas ficam próximas.
+    Ao longo da seca, cada 1 °C a mais na superfície veio com cerca de ${fmt(i.seca.inclinacao_ar_por_grau_lst, 2)} °C a mais no ar. É uma relação no tempo, num único ponto, e não uma medida direta do efeito das árvores, mas indica que o frescor sentido no ar é bem menor que o da superfície.`;
+  const seca = i.pontos.filter((p) => p.seca), chuva = i.pontos.filter((p) => !p.seca);
+  new Chart($("#chart-inmet"), {
+    type: "scatter",
+    data: { datasets: [
+      { label: "Estação seca (jun a out)", data: seca.map((p) => ({ x: p.ar, y: p.lst, d: p.data })), backgroundColor: "#c2412d", pointRadius: 3 },
+      { label: "Estação chuvosa", data: chuva.map((p) => ({ x: p.ar, y: p.lst, d: p.data })), backgroundColor: "#2f6fae", pointRadius: 3 }] },
+    options: { responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { labels: { boxWidth: 10, font: { size: 10 } } }, tooltip: { callbacks: { label: (c) => `${c.raw.d}: ar ${fmt(c.raw.x, 1)} °C, superfície ${fmt(c.raw.y, 1)} °C` } } },
+      scales: { x: { title: { display: true, text: "temperatura do ar às 10h (°C, INMET)" } }, y: { title: { display: true, text: "superfície (°C, Landsat)" } } } },
+  });
+}
+
 function preencherValidacaoReal() {
+  preencherInmet();
   const v = S.meta.validacao_real;
   if (!v) { $("#valid-real").style.display = "none"; return; }
   const n = v.experimento_natural, g = n.grupos, anos = (a) => `${a[0]}–${String(a[a.length - 1]).slice(2)}`;
@@ -597,9 +634,26 @@ function preencherSobre() {
   ].map((t) => `<li>${t}</li>`).join("");
 }
 
+/* ---------------- plano completo (nova aba) ---------------- */
+function gerarPlano(origem) {
+  const { plano } = montarPlano();
+  if (origem === "plano" && !plano.length) { alert("O plano está vazio: aumente o número de árvores ou ajuste os filtros."); return; }
+  const payload = {
+    versao: 1, gerado_em: new Date().toISOString(), link: (escreverHash(), location.href), origem,
+    params: { estrategia: S.estrategia, tipos: [...S.tipos], bairro: S.bairro, filtroEquip: S.filtroEquip, dist: S.dist,
+              filtroInc: S.filtroInc, custoArvore: S.custoArvore, custoManut: S.custoManut, porte: S.porte },
+    areas: origem === "desenho" ? [] : plano,
+    desenho: origem === "desenho" && typeof DES !== "undefined" ? DES.resultado : null,
+  };
+  window.ARBORMAP_PLANO = payload;
+  try { localStorage.setItem("arbormap_plano", JSON.stringify(payload)); } catch (e) { /* sem armazenamento: a aba lê do opener */ }
+  const w = window.open("plano.html", "_blank");
+  if (!w) alert("O navegador bloqueou a nova aba. Permita pop-ups para este site e clique de novo.");
+}
+
 /* ---------------- link do plano (hash) ---------------- */
 function escreverHash() {
-  const h = new URLSearchParams({ e: S.estrategia, n: S.orcArvores, t: [...S.tipos].join(","), m2: S.m2 });
+  const h = new URLSearchParams({ e: S.estrategia, n: S.orcArvores, t: [...S.tipos].join(","), po: S.porte });
   if (S.bairro) h.set("b", S.bairro);
   if (S.filtroEquip) h.set("eq", S.dist);
   if (S.filtroInc) h.set("inc", 1);
@@ -616,7 +670,7 @@ function lerHash() {
   S.estrategia = h.get("e") in ESTRATEGIAS || h.get("e") === "manual" ? h.get("e") : "eficiencia";
   S.orcArvores = +h.get("n") || S.orcArvores;
   if (h.has("t")) S.tipos = new Set(h.get("t").split(",").filter((t) => t in TIPOS));
-  S.m2 = +h.get("m2") || 36;
+  S.porte = ["misto", "pequeno", "medio", "grande"].includes(h.get("po")) ? h.get("po") : "misto";
   S.bairro = h.get("b") || "";
   if (h.has("eq")) { S.filtroEquip = true; S.dist = +h.get("eq") || 300; }
   S.filtroInc = h.has("inc");

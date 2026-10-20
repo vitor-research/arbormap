@@ -32,14 +32,14 @@ def _load(path):
 
 def static_nodata_mask(files, freq_min=0.9):
     """Pixels com LST zerada em pelo menos `freq_min` das cenas (artefato fixo)."""
-    z = np.stack([_load(f)[CH_LST] <= 1.0 for f in files])
+    z = np.stack([~(_load(f)[CH_LST] > 1.0) for f in files])   # zero ou NaN
     return z.mean(0) >= freq_min
 
 
 def cloud_mask(img, static):
-    """Pixels de nuvem numa cena: zerados fora do artefato fixo ou manchas frias em terra firme."""
+    """Pixels de nuvem numa cena: zerados (ou NaN) fora do artefato fixo ou manchas frias em terra firme."""
     lst, ndwi = img[CH_LST], img[CH_NDWI]
-    zeros = (lst <= 1.0) & ~static
+    zeros = ~(lst > 1.0) & ~static
     land = (ndwi < 0.1) & (lst > 1.0) & ~static
     vals = lst[land]
     med = float(np.median(vals)) if vals.size else 0.0
@@ -48,9 +48,13 @@ def cloud_mask(img, static):
     return zeros | cold
 
 
-def dry_season_composite(city_dir, months=MESES_SECOS, max_cloud=0.03, years=None):
+def dry_season_composite(city_dir, months=MESES_SECOS, max_cloud=0.03, years=None, buraco_so_lst=False):
     """Mediana das cenas limpas da estação seca (opcionalmente só dos anos `years`).
-    Devolve as bandas compostas e o registro."""
+    Devolve as bandas compostas e o registro.
+
+    buraco_so_lst: para os dados do Planetary Computer. Onde falta só a banda térmica (o produto de
+    temperatura da superfície do Landsat C2 tem lacunas onde as demais bandas existem), descarta-se
+    só a LST, mantendo NDVI, NDBI, NDWI e DEM, que são as entradas do modelo."""
     files = sorted(Path(city_dir).glob("*.npy"))
     static = static_nodata_mask(files)
     usable = ~static
@@ -66,7 +70,12 @@ def dry_season_composite(city_dir, months=MESES_SECOS, max_cloud=0.03, years=Non
             rejected.append({"arquivo": f.name, "nuvem": round(frac, 4)})
             continue
         img = img.copy()
-        img[:, cm | static] = np.nan
+        if buraco_so_lst:
+            gap = ~(img[CH_LST] > 1.0) & np.isfinite(img[CH_NDVI])
+            img[:, cm & ~gap] = np.nan
+            img[CH_LST, gap | static] = np.nan
+        else:
+            img[:, cm | static] = np.nan
         stack.append(img)
         used.append({"arquivo": f.name, "nuvem": round(frac, 4)})
     if not stack:
@@ -148,6 +157,83 @@ def predict_city(city_dir, ckpt_dir, city, device="cpu", months=MESES_SECOS, max
               "n_cenas": np.pad(count[y0:y0 + hh, x0:x0 + ww], ((0, CROP - hh), (0, CROP - ww))),
               "artefato_fixo": np.pad(static[y0:y0 + hh, x0:x0 + ww], ((0, CROP - hh), (0, CROP - ww)))}
     return layers, meta, held_out
+
+
+def _janelas(n, win, stride):
+    pos = list(range(0, max(1, n - win) + 1, stride))
+    if pos[-1] != max(0, n - win):
+        pos.append(max(0, n - win))
+    return pos
+
+
+def _peso(win):
+    t = np.minimum(np.arange(win) + 1, np.arange(win)[::-1] + 1).astype(np.float32)
+    t = np.minimum(t, win / 4) / (win / 4)
+    return np.outer(t, t)
+
+
+def windowed_input(comp, stats):
+    """Entrada normalizada da grade inteira (4, H, W), com as bandas ausentes preenchidas pela mediana."""
+    mean, std = np.asarray(stats[0], np.float32), np.asarray(stats[1], np.float32)
+    raw = np.where(np.isfinite(comp), comp, np.nanmedian(comp.reshape(5, -1), axis=1)[:, None, None]).astype(np.float32)
+    raw[CH_LST] = np.clip(raw[CH_LST], LST_CLIP_MIN, LST_CLIP_MAX)
+    raw[CH_NDVI] = np.clip(raw[CH_NDVI], -1, 1)
+    raw[CH_NDWI] = np.clip(raw[CH_NDWI], -1, 1)
+    norm = (raw - mean[:, None, None]) / (std[:, None, None] + 1e-6)
+    return np.stack([norm[CH_NDVI], norm[CH_NDBI], norm[CH_DEM], norm[CH_NDWI]])
+
+
+def predict_windowed(model, x, obs, win=CROP, stride=CROP // 2, device="cpu"):
+    """Previsão numa grade maior que o recorte de treino: janelas de `win` px com sobreposição.
+    Em cada janela, a anomalia padronizada vira °C com a média e o DP da LST observada da própria
+    janela (a mesma conversão da validação); as janelas são combinadas com peso maior no centro."""
+    _, H, W = x.shape
+    acc = np.zeros((H, W), np.float32); wsum = np.zeros((H, W), np.float32)
+    pw = _peso(win)
+    for y0 in _janelas(H, win, stride):
+        for x0 in _janelas(W, win, stride):
+            o = obs[y0:y0 + win, x0:x0 + win]
+            if np.isfinite(o).mean() < 0.2:      # precisa de LST observada para converter em °C
+                continue
+            mu, sd = float(np.nanmean(o)), float(np.nanstd(o))
+            xx = torch.from_numpy(x[:, y0:y0 + win, x0:x0 + win][None]).float().to(device)
+            with torch.no_grad():
+                z = model(xx)[0, 0].cpu().numpy()
+            acc[y0:y0 + win, x0:x0 + win] += (z * sd + mu) * pw
+            wsum[y0:y0 + win, x0:x0 + win] += pw
+    return np.where(wsum > 0, acc / np.maximum(wsum, 1e-6), np.nan)
+
+
+def predict_city_large(city_dir, ckpt_dir, city, device="cpu", months=MESES_SECOS, max_cloud=1.0, log=print):
+    """Como predict_city, para uma grade maior que 400 px (sem recorte), por janelas."""
+    comp, static, count, reg = dry_season_composite(city_dir, months, max_cloud, buraco_so_lst=True)
+    reg["pixels_sem_lst_observada"] = int((~np.isfinite(comp[CH_LST])).sum())
+    static = ~np.isfinite(comp[CH_NDVI])          # sem dado só onde faltam as entradas do modelo
+    reg["pixels_artefato_fixo"] = int(static.sum())
+    obs = comp[CH_LST].copy()
+    ok = np.isfinite(obs)
+    mu = float(np.nanmean(obs))
+    preds, held = [], None
+    for ck in sorted(Path(ckpt_dir).glob("best_hybrid_fold_*.pt")):
+        model, st = load_model(ck, device)
+        x = windowed_input(comp, (st["mean"], st["std"]))
+        p = predict_windowed(model, x, obs, device=device)
+        preds.append(p)
+        log(f"   {ck.name}: MAE {np.nanmean(np.abs(p - obs)[ok]):.2f} °C")
+        if city in st["val_cities"]:
+            held = {"pred": p, "ckpt": ck.name, "fold": st["fold"] + 1, "val_cities": st["val_cities"], "stats": (st["mean"], st["std"])}
+    P = np.stack(preds)
+    pred = held["pred"]
+    v = ok & np.isfinite(pred)
+    meta = {"cidade": city, "composicao": reg, "lst_media_composicao_c": mu, "lst_dp_composicao_c": float(np.nanstd(obs)),
+            "modelo_principal": held["ckpt"], "fold_principal": held["fold"], "val_cities_fold_principal": held["val_cities"],
+            "mae_composicao_c": float(np.abs(pred - obs)[v].mean()), "pearson_composicao": float(np.corrcoef(pred[v], obs[v])[0, 1]),
+            "incerteza_media_c": float(np.nanmean(P.std(0))), "shape_original": list(comp.shape[1:]),
+            "recorte_y0_x0": [0, 0], "recorte_h_w": list(comp.shape[1:]), "janela_px": CROP, "passo_px": CROP // 2}
+    layers = {"lst_pred": pred, "lst_obs": obs, "incerteza": P.std(0), "anomalia": pred - mu,
+              "ndvi": comp[CH_NDVI], "ndbi": comp[CH_NDBI], "ndwi": comp[CH_NDWI], "dem": comp[CH_DEM],
+              "n_cenas": count, "artefato_fixo": static}
+    return layers, meta, held
 
 
 def save_layers(layers, meta, out_dir, prefix):

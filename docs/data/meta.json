@@ -2,26 +2,26 @@
  "cidade": "Teresina",
  "bounds_leaflet": [
   [
-   -5.133987957561347,
-   -42.8441101129482
+   -5.228196943505897,
+   -42.87676509382966
   ],
   [
-   -5.026012042438653,
-   -42.73615976292685
+   -4.943140527581986,
+   -42.68110508441597
   ]
  ],
  "camadas": {
   "anomalia": {
    "arquivo": "teresina_anomalia.png",
-   "min": -8.0,
-   "max": 8.0,
+   "min": -7.0,
+   "max": 7.0,
    "cmap": "RdYlBu_r",
    "unidade": "°C"
   },
   "incerteza": {
    "arquivo": "teresina_incerteza.png",
    "min": 0,
-   "max": 1.1,
+   "max": 0.8,
    "cmap": "magma_r",
    "unidade": "°C"
   },
@@ -36,7 +36,7 @@
    "arquivo": "teresina_inviavel.png"
   }
  },
- "lst_media_cidade_c": 38.32,
+ "lst_media_cidade_c": 36.0,
  "composicao": {
   "cenas": [
    "2018_06.npy",
@@ -60,9 +60,9 @@
    9,
    10
   ],
-  "mae_c": 1.01,
-  "pearson": 0.914,
-  "incerteza_media_c": 0.32,
+  "mae_c": 1.29,
+  "pearson": 0.887,
+  "incerteza_media_c": 0.31,
   "modelo": "best_hybrid_fold_0.pt",
   "fold": 1,
   "val_cities": [
@@ -184,15 +184,15 @@
   }
  },
  "bairros": {
-  "lst_p90_c": 41.8,
+  "lst_p90_c": 40.64,
   "n_bairros": 123,
-  "n_com_metricas": 89,
+  "n_com_metricas": 123,
   "cobertura_minima": 0.3,
   "bounds": [
-   -42.8441101129482,
-   -5.133987957561347,
-   -42.73615976292685,
-   -5.026012042438653
+   -42.87676509382966,
+   -5.228196943505897,
+   -42.68110508441597,
+   -4.943140527581986
   ],
   "fontes": [
    "IBGE, Censo 2022: malha de bairros e setores com atributos",
@@ -202,16 +202,16 @@
  "areas": {
   "aditividade": {
    "n_areas": 20,
-   "integral_conjunto": 724.46,
-   "soma_individuais": 909.41,
-   "razao_conjunto_soma": 0.797
+   "integral_conjunto": 1234.41,
+   "soma_individuais": 1697.27,
+   "razao_conjunto_soma": 0.727
   },
   "assinatura_vegetacao": {
-   "0": 0.7210023403167725,
-   "2": -0.22303733229637146,
-   "1": -0.6923365592956543
+   "0": 0.7707253694534302,
+   "2": -0.24200919270515442,
+   "1": -0.7199438810348511
   },
-  "n_areas": 355
+  "n_areas": 737
  },
  "validacao_real": {
   "experimento_natural": {
@@ -663,6 +663,549 @@
   },
   "modelo": "best_hybrid_fold_0.pt"
  },
+ "validacao_inmet": {
+  "n_dias": 82,
+  "periodo": [
+   "2018-04-24",
+   "2024-09-15"
+  ],
+  "pearson_lst_estacao_x_ar": 0.563,
+  "pearson_lst_caixa_x_ar": 0.533,
+  "pearson_lst_estacao_x_tmax": 0.471,
+  "inclinacao_lst_por_grau_ar": 6.76,
+  "lst_menos_ar_media_c": 6.1,
+  "lst_menos_ar_seca_c": 8.23,
+  "lst_menos_ar_chuvosa_c": 0.3,
+  "media_seca": {
+   "lst": 39.3,
+   "ar": 31.1
+  },
+  "media_chuvosa": {
+   "lst": 30.7,
+   "ar": 30.4
+  },
+  "pontos": [
+   {
+    "data": "2018-04-24",
+    "lst": 46.18,
+    "ar": 29.3,
+    "seca": false
+   },
+   {
+    "data": "2018-06-11",
+    "lst": 34.87,
+    "ar": 28.5,
+    "seca": true
+   },
+   {
+    "data": "2018-07-13",
+    "lst": 33.18,
+    "ar": 28.8,
+    "seca": true
+   },
+   {
+    "data": "2018-07-29",
+    "lst": 45.38,
+    "ar": 30.6,
+    "seca": true
+   },
+   {
+    "data": "2018-08-30",
+    "lst": 44.96,
+    "ar": 29.9,
+    "seca": true
+   },
+   {
+    "data": "2018-09-15",
+    "lst": 45.66,
+    "ar": 30.0,
+    "seca": true
+   },
+   {
+    "data": "2018-11-02",
+    "lst": 54.34,
+    "ar": 31.5,
+    "seca": false
+   },
+   {
+    "data": "2018-11-18",
+    "lst": 53.27,
+    "ar": 31.9,
+    "seca": false
+   },
+   {
+    "data": "2018-12-20",
+    "lst": 12.25,
+    "ar": 29.5,
+    "seca": false
+   },
+   {
+    "data": "2019-03-10",
+    "lst": 37.3,
+    "ar": 28.9,
+    "seca": false
+   },
+   {
+    "data": "2019-05-29",
+    "lst": 35.5,
+    "ar": 30.8,
+    "seca": false
+   },
+   {
+    "data": "2019-06-30",
+    "lst": 39.66,
+    "ar": 29.8,
+    "seca": true
+   },
+   {
+    "data": "2019-08-01",
+    "lst": 41.48,
+    "ar": 31.0,
+    "seca": true
+   },
+   {
+    "data": "2019-09-02",
+    "lst": 48.0,
+    "ar": 30.2,
+    "seca": true
+   },
+   {
+    "data": "2019-09-18",
+    "lst": 46.53,
+    "ar": 32.0,
+    "seca": true
+   },
+   {
+    "data": "2019-11-05",
+    "lst": 48.67,
+    "ar": 32.2,
+    "seca": false
+   },
+   {
+    "data": "2019-12-07",
+    "lst": 49.48,
+    "ar": 32.4,
+    "seca": false
+   },
+   {
+    "data": "2020-05-31",
+    "lst": 36.75,
+    "ar": 28.7,
+    "seca": false
+   },
+   {
+    "data": "2020-06-16",
+    "lst": 37.17,
+    "ar": 28.6,
+    "seca": true
+   },
+   {
+    "data": "2020-07-18",
+    "lst": 35.69,
+    "ar": 28.4,
+    "seca": true
+   },
+   {
+    "data": "2020-08-03",
+    "lst": 35.07,
+    "ar": 29.4,
+    "seca": true
+   },
+   {
+    "data": "2020-08-19",
+    "lst": 41.6,
+    "ar": 30.3,
+    "seca": true
+   },
+   {
+    "data": "2020-09-04",
+    "lst": 44.13,
+    "ar": 31.0,
+    "seca": true
+   },
+   {
+    "data": "2021-06-19",
+    "lst": 33.05,
+    "ar": 29.1,
+    "seca": true
+   },
+   {
+    "data": "2021-07-05",
+    "lst": 33.83,
+    "ar": 29.4,
+    "seca": true
+   },
+   {
+    "data": "2021-07-21",
+    "lst": 34.36,
+    "ar": 30.7,
+    "seca": true
+   },
+   {
+    "data": "2021-08-06",
+    "lst": 37.84,
+    "ar": 30.9,
+    "seca": true
+   },
+   {
+    "data": "2021-08-22",
+    "lst": 41.96,
+    "ar": 32.3,
+    "seca": true
+   },
+   {
+    "data": "2021-09-07",
+    "lst": 41.34,
+    "ar": 31.1,
+    "seca": true
+   },
+   {
+    "data": "2021-10-25",
+    "lst": 37.25,
+    "ar": 32.2,
+    "seca": true
+   },
+   {
+    "data": "2021-12-12",
+    "lst": 32.11,
+    "ar": 29.9,
+    "seca": false
+   },
+   {
+    "data": "2022-02-22",
+    "lst": 29.68,
+    "ar": 29.7,
+    "seca": false
+   },
+   {
+    "data": "2022-04-27",
+    "lst": 34.46,
+    "ar": 29.7,
+    "seca": false
+   },
+   {
+    "data": "2022-05-29",
+    "lst": 32.76,
+    "ar": 29.5,
+    "seca": false
+   },
+   {
+    "data": "2022-06-14",
+    "lst": 33.94,
+    "ar": 30.0,
+    "seca": true
+   },
+   {
+    "data": "2022-06-30",
+    "lst": 35.13,
+    "ar": 30.0,
+    "seca": true
+   },
+   {
+    "data": "2022-07-16",
+    "lst": 37.81,
+    "ar": 29.8,
+    "seca": true
+   },
+   {
+    "data": "2022-07-24",
+    "lst": 36.41,
+    "ar": 30.5,
+    "seca": true
+   },
+   {
+    "data": "2022-08-09",
+    "lst": 38.3,
+    "ar": 31.4,
+    "seca": true
+   },
+   {
+    "data": "2022-08-17",
+    "lst": 37.07,
+    "ar": 30.5,
+    "seca": true
+   },
+   {
+    "data": "2022-09-02",
+    "lst": 40.83,
+    "ar": 31.1,
+    "seca": true
+   },
+   {
+    "data": "2022-09-26",
+    "lst": 43.94,
+    "ar": 32.0,
+    "seca": true
+   },
+   {
+    "data": "2022-10-04",
+    "lst": 43.8,
+    "ar": 31.4,
+    "seca": true
+   },
+   {
+    "data": "2022-10-12",
+    "lst": 46.72,
+    "ar": 33.1,
+    "seca": true
+   },
+   {
+    "data": "2022-10-28",
+    "lst": 39.42,
+    "ar": 32.9,
+    "seca": true
+   },
+   {
+    "data": "2022-12-07",
+    "lst": 38.16,
+    "ar": 31.3,
+    "seca": false
+   },
+   {
+    "data": "2022-12-23",
+    "lst": -123.15,
+    "ar": 25.0,
+    "seca": false
+   },
+   {
+    "data": "2023-01-08",
+    "lst": 30.78,
+    "ar": 29.3,
+    "seca": false
+   },
+   {
+    "data": "2023-05-08",
+    "lst": 36.2,
+    "ar": 30.9,
+    "seca": false
+   },
+   {
+    "data": "2023-06-01",
+    "lst": 38.01,
+    "ar": 30.5,
+    "seca": true
+   },
+   {
+    "data": "2023-06-09",
+    "lst": 37.23,
+    "ar": 30.8,
+    "seca": true
+   },
+   {
+    "data": "2023-06-17",
+    "lst": 32.31,
+    "ar": 30.3,
+    "seca": true
+   },
+   {
+    "data": "2023-06-25",
+    "lst": 36.14,
+    "ar": 29.5,
+    "seca": true
+   },
+   {
+    "data": "2023-07-03",
+    "lst": 20.94,
+    "ar": 29.8,
+    "seca": true
+   },
+   {
+    "data": "2023-07-19",
+    "lst": 38.09,
+    "ar": 31.1,
+    "seca": true
+   },
+   {
+    "data": "2023-07-27",
+    "lst": 37.85,
+    "ar": 31.2,
+    "seca": true
+   },
+   {
+    "data": "2023-08-04",
+    "lst": 42.7,
+    "ar": 31.6,
+    "seca": true
+   },
+   {
+    "data": "2023-08-12",
+    "lst": 41.89,
+    "ar": 32.4,
+    "seca": true
+   },
+   {
+    "data": "2023-08-20",
+    "lst": 43.26,
+    "ar": 32.4,
+    "seca": true
+   },
+   {
+    "data": "2023-09-05",
+    "lst": 41.18,
+    "ar": 32.5,
+    "seca": true
+   },
+   {
+    "data": "2023-09-13",
+    "lst": 43.98,
+    "ar": 33.4,
+    "seca": true
+   },
+   {
+    "data": "2023-09-21",
+    "lst": 44.8,
+    "ar": 34.0,
+    "seca": true
+   },
+   {
+    "data": "2023-09-29",
+    "lst": 45.16,
+    "ar": 33.0,
+    "seca": true
+   },
+   {
+    "data": "2023-10-07",
+    "lst": 45.61,
+    "ar": 34.5,
+    "seca": true
+   },
+   {
+    "data": "2023-10-15",
+    "lst": 47.96,
+    "ar": 34.9,
+    "seca": true
+   },
+   {
+    "data": "2023-10-31",
+    "lst": 45.0,
+    "ar": 32.6,
+    "seca": true
+   },
+   {
+    "data": "2023-11-16",
+    "lst": 42.27,
+    "ar": 32.2,
+    "seca": false
+   },
+   {
+    "data": "2023-12-26",
+    "lst": 39.31,
+    "ar": 33.3,
+    "seca": false
+   },
+   {
+    "data": "2024-01-19",
+    "lst": 39.52,
+    "ar": 31.3,
+    "seca": false
+   },
+   {
+    "data": "2024-03-07",
+    "lst": 36.84,
+    "ar": 31.4,
+    "seca": false
+   },
+   {
+    "data": "2024-05-02",
+    "lst": 33.03,
+    "ar": 30.4,
+    "seca": false
+   },
+   {
+    "data": "2024-06-11",
+    "lst": 35.33,
+    "ar": 29.9,
+    "seca": true
+   },
+   {
+    "data": "2024-06-19",
+    "lst": 33.57,
+    "ar": 29.8,
+    "seca": true
+   },
+   {
+    "data": "2024-06-27",
+    "lst": 36.19,
+    "ar": 30.6,
+    "seca": true
+   },
+   {
+    "data": "2024-07-05",
+    "lst": 34.63,
+    "ar": 30.4,
+    "seca": true
+   },
+   {
+    "data": "2024-07-13",
+    "lst": 33.03,
+    "ar": 29.5,
+    "seca": true
+   },
+   {
+    "data": "2024-07-21",
+    "lst": 36.82,
+    "ar": 30.4,
+    "seca": true
+   },
+   {
+    "data": "2024-07-29",
+    "lst": 37.98,
+    "ar": 31.3,
+    "seca": true
+   },
+   {
+    "data": "2024-08-22",
+    "lst": 38.46,
+    "ar": 33.0,
+    "seca": true
+   },
+   {
+    "data": "2024-08-30",
+    "lst": 38.75,
+    "ar": 31.7,
+    "seca": true
+   },
+   {
+    "data": "2024-09-07",
+    "lst": 40.85,
+    "ar": 32.9,
+    "seca": true
+   },
+   {
+    "data": "2024-09-15",
+    "lst": 42.74,
+    "ar": 32.4,
+    "seca": true
+   }
+  ],
+  "estacao": {
+   "codigo": "A312",
+   "lat": -5.03472221,
+   "lon": -42.80138888
+  },
+  "inclinacao_ar_por_grau_lst": 0.047,
+  "p_valor": 3.8e-08,
+  "seca": {
+   "n": 60,
+   "pearson": 0.621,
+   "inclinacao_ar_por_grau_lst": 0.186
+  },
+  "chuva_media_mensal_mm": {
+   "1": 170.0,
+   "2": 317.0,
+   "3": 372.0,
+   "4": 293.0,
+   "5": 97.0,
+   "6": 27.0,
+   "7": 19.0,
+   "8": 1.0,
+   "9": 15.0,
+   "10": 17.0,
+   "11": 50.0,
+   "12": 189.0
+  },
+  "chuva_nota": "média 2018-2024 dos meses com pelo menos 25 dias completos (>= 20 registros horários)"
+ },
  "custos_referencia": {
   "fonte": "SINAPI (Caixa), planilha SINAPI_Referência_2026_09.xlsx, aba CSD, coluna PI (Teresina)",
   "base": "09/2026, sem desoneração, emitida em 09/10/2026",
@@ -689,7 +1232,7 @@
   "resolucao_m": 30
  },
  "fontes": [
-  "Landsat 8/9 (USGS), via Google Earth Engine: LST, NDVI, NDBI, NDWI; SRTM: DEM",
+  "Landsat 8/9 Collection 2 Nível 2 (USGS): LST, NDVI, NDBI, NDWI. Treino do modelo com dados via Google Earth Engine (DEM SRTM); mapa de Teresina ampliado com os mesmos produtos via Microsoft Planetary Computer (DEM NASADEM); na área em comum, LST observada com correlação de 0,989 e NDVI com 0,957 entre as duas fontes",
   "Modelo: UrbanHeatNet (ARBORMAP v1.0.0), validação cruzada por cidade",
   "IBGE, Censo 2022: bairros, setores e demografia",
   "Overture Maps (Google Open Buildings, OpenStreetMap, Microsoft): contornos de prédios",

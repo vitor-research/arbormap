@@ -1,12 +1,24 @@
 /* ARBORMAP: modo "desenhar área livre". O gestor desenha um polígono; só a parte plantável dele
    (praça, calçada ou lote livre, fora de água, encosta e áreas já vegetadas) recebe árvores, e a
-   UrbanHeatNet roda no navegador (onnxruntime-web, WebGPU quando houver) sobre a cidade inteira.
-   Mesma conta de arbormap.decision.areas_candidatas.Simulador.effect. */
+   UrbanHeatNet roda no navegador (onnxruntime-web, WebGPU quando houver) na janela de 400 px
+   centrada no desenho (o tamanho de cena do treino). Mesma conta de
+   arbormap.decision.areas_candidatas.SimuladorJanelas.effect. */
 
 const ORT_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.webgpu.min.js";
 const MOD = DATA + "modelo/";
-const DES = { pts: [], linha: null, poly: null, ativo: false, sess: null, ep: null, x: null, yBase: null,
+const DES = { pts: [], linha: null, poly: null, ativo: false, sess: null, ep: null, x: null, obs: null, bases: new Map(),
               pl: null, valido: null, info: null, overlay: null, carregando: null };
+const grade = () => (DES.info ? [DES.info.shape[2], DES.info.shape[3]] : [400, 400]);
+
+// float16 (IEEE 754) para float32
+function f16paraF32(buf) {
+  const h = new Uint16Array(buf), out = new Float32Array(h.length);
+  for (let i = 0; i < h.length; i++) {
+    const v = h[i], s = v & 0x8000 ? -1 : 1, e = (v >> 10) & 0x1f, m = v & 0x3ff;
+    out[i] = e === 0 ? s * 2 ** -14 * (m / 1024) : e === 31 ? (m ? NaN : s * Infinity) : s * 2 ** (e - 15) * (1 + m / 1024);
+  }
+  return out;
+}
 
 function carregarScript(src) {
   return new Promise((ok, erro) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => erro(new Error("falha ao carregar " + src)); document.head.appendChild(s); });
@@ -19,8 +31,12 @@ async function carregarModelo(status) {
   DES.carregando = (async () => {
     status("Baixando o modelo (26 MB, só na primeira vez)...");
     if (!window.ort) await carregarScript(ORT_URL);
-    const [modelo, x, pl, val, info] = await Promise.all([buscar("urbanheatnet_fp16.onnx"), buscar("entrada.bin"), buscar("plantavel.bin"), buscar("valido.bin"), buscar("sim.json", "json")]);
-    DES.x = new Float32Array(x); DES.pl = new Uint8Array(pl); DES.valido = new Uint8Array(val); DES.info = info;
+    const info = await buscar("sim.json", "json");
+    const f16 = info.formato_entrada === "f16";
+    const [modelo, x, pl, val, obs] = await Promise.all([buscar("urbanheatnet_fp16.onnx"), buscar(f16 ? "entrada_f16.bin" : "entrada.bin"),
+      buscar("plantavel.bin"), buscar("valido.bin"), info.janela ? buscar("lst_obs_f16.bin") : Promise.resolve(null)]);
+    DES.x = f16 ? f16paraF32(x) : new Float32Array(x); DES.pl = new Uint8Array(pl); DES.valido = new Uint8Array(val); DES.info = info;
+    DES.obs = obs ? f16paraF32(obs) : null;
     status("Preparando o modelo...");
     const eps = navigator.gpu ? ["webgpu", "wasm"] : ["wasm"];
     for (const ep of eps) {
@@ -28,15 +44,13 @@ async function carregarModelo(status) {
       catch (e) { console.warn("ARBORMAP: " + ep + " indisponível", e); }
     }
     if (!DES.sess) throw new Error("o navegador não conseguiu executar o modelo");
-    status(DES.ep === "webgpu" ? "Calculando o cenário atual (placa de vídeo)..." : "Calculando o cenário atual (sem placa de vídeo: cerca de 30 s)...");
-    DES.yBase = await prever(DES.x);
+
   })();
   try { await DES.carregando; } finally { DES.carregando = null; }
 }
 
-async function prever(x) {
-  const [, c, h, w] = DES.info.shape;
-  const r = await DES.sess.run({ x: new ort.Tensor("float32", x, [1, c, h, w]) });
+async function prever(x, h, w) {
+  const r = await DES.sess.run({ x: new ort.Tensor("float32", x, [1, 4, h, w]) });
   return Float32Array.from(r.y.data);
 }
 
@@ -71,7 +85,7 @@ function concluirDesenho() {
   const f = fracaoDesenho();
   const ha = f.soma * DES_PIXEL_HA();
   $("#d-status").textContent = ha > 0
-    ? `Área desenhada com ${fmt(ha, 2)} ha plantáveis (cerca de ${fmt(ha * 10000 / S.m2)} árvores). Clique em Simular.`
+    ? `Área desenhada com ${fmt(ha, 2)} ha plantáveis (cerca de ${fmt(arvoresDesenho(f))} árvores). Clique em Simular.`
     : "A área desenhada não tem espaço plantável nas classes escolhidas (ou já é vegetada). Desenhe outra.";
   atualizarBotoesDesenho(ha > 0);
 }
@@ -88,19 +102,24 @@ function atualizarBotoesDesenho(podeSimular = false) {
   $("#d-simular").disabled = !podeSimular;
 }
 const DES_PIXEL_HA = () => (DES.info ? DES.info.pixel_ha : 0.09);
+const TIPO_CLASSE = ["praca", "calcada", "livre"];
+function arvoresDesenho(fd) {
+  return Math.max(1, Math.round(fd.porClasse.reduce((s, v, i) => s + v * DES_PIXEL_HA() * arvoresPorHa(TIPO_CLASSE[i]), 0)));
+}
 
 /* fração plantável dentro do polígono, pixel a pixel (centro do pixel dentro do polígono) */
 function fracaoDesenho() {
-  const N = 400, [[s, w], [n, e]] = S.meta.bounds_leaflet;
-  const frac = new Float32Array(N * N);
-  if (!DES.pts.length) return { frac, soma: 0 };
-  const poly = DES.pts.map((p) => [(p.lng - w) / (e - w) * N - 0.5, (n - p.lat) / (n - s) * N - 0.5]);
+  const [H, Wd] = grade(), N = H, [[s, w], [n, e]] = S.meta.bounds_leaflet;
+  const frac = new Float32Array(H * Wd);
+  if (!DES.pts.length) return { frac, soma: 0, porClasse: [0, 0, 0] };
+  const poly = DES.pts.map((p) => [(p.lng - w) / (e - w) * Wd - 0.5, (n - p.lat) / (n - s) * H - 0.5]);
   const xs = poly.map((p) => p[0]), ys = poly.map((p) => p[1]);
-  const c0 = Math.max(0, Math.floor(Math.min(...xs))), c1 = Math.min(N - 1, Math.ceil(Math.max(...xs)));
-  const r0 = Math.max(0, Math.floor(Math.min(...ys))), r1 = Math.min(N - 1, Math.ceil(Math.max(...ys)));
+  const c0 = Math.max(0, Math.floor(Math.min(...xs))), c1 = Math.min(Wd - 1, Math.ceil(Math.max(...xs)));
+  const r0 = Math.max(0, Math.floor(Math.min(...ys))), r1 = Math.min(H - 1, Math.ceil(Math.max(...ys)));
   const classes = $$(".d-classe").map((c) => c.checked);
   const pl = DES.pl;
   let soma = 0;
+  const porClasse = [0, 0, 0];
   for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
     let dentro = false;
     for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
@@ -108,56 +127,84 @@ function fracaoDesenho() {
       if ((yi > r) !== (yj > r) && c < ((xj - xi) * (r - yi)) / (yj - yi) + xi) dentro = !dentro;
     }
     if (!dentro) continue;
-    const k = r * N + c;
+    const k = r * Wd + c;
     let f = 0;
-    if (pl) classes.forEach((on, ci) => { if (on) f += pl[ci * N * N + k] / 255; });
+    if (pl) classes.forEach((on, ci) => { if (on) { const v = pl[ci * H * Wd + k] / 255; f += v; porClasse[ci] += v; } });
     else f = 1;
     f = Math.min(1, f);
     frac[k] = f; soma += f;
   }
-  return { frac, soma };
+  return { frac, soma, porClasse };
 }
 
 /* desfoque gaussiano separável, como cv2.GaussianBlur (borda BORDER_REFLECT_101) */
-function gauss(src, N, k, sigma) {
+function gauss(src, H, W, k, sigma) {
   const h = (k - 1) / 2, w = [];
   let t = 0;
   for (let i = -h; i <= h; i++) { const v = Math.exp(-(i * i) / (2 * sigma * sigma)); w.push(v); t += v; }
   for (let i = 0; i < w.length; i++) w[i] /= t;
-  const refl = (i) => (i < 0 ? -i : i >= N ? 2 * N - 2 - i : i);
-  const tmp = new Float32Array(N * N), out = new Float32Array(N * N);
-  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) { let s = 0; for (let d = -h; d <= h; d++) s += w[d + h] * src[r * N + refl(c + d)]; tmp[r * N + c] = s; }
-  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) { let s = 0; for (let d = -h; d <= h; d++) s += w[d + h] * tmp[refl(r + d) * N + c]; out[r * N + c] = s; }
+  const refl = (i, n) => (i < 0 ? -i : i >= n ? 2 * n - 2 - i : i);
+  const tmp = new Float32Array(H * W), out = new Float32Array(H * W);
+  for (let r = 0; r < H; r++) for (let c = 0; c < W; c++) { let s = 0; for (let d = -h; d <= h; d++) s += w[d + h] * src[r * W + refl(c + d, W)]; tmp[r * W + c] = s; }
+  for (let r = 0; r < H; r++) for (let c = 0; c < W; c++) { let s = 0; for (let d = -h; d <= h; d++) s += w[d + h] * tmp[refl(r + d, H) * W + c]; out[r * W + c] = s; }
+  return out;
+}
+
+/* janela de 400 px centrada na área (mesma regra de SimuladorJanelas.janela no Python) */
+function janelaDe(frac, H, W) {
+  const win = DES.info.janela;
+  if (!win) return { y0: 0, x0: 0, h: H, w: W };
+  let rmin = H, rmax = -1, cmin = W, cmax = -1;
+  for (let r = 0; r < H; r++) for (let c = 0; c < W; c++) if (frac[r * W + c] > 0) { rmin = Math.min(rmin, r); rmax = Math.max(rmax, r); cmin = Math.min(cmin, c); cmax = Math.max(cmax, c); }
+  const passo = DES.info.passo, cy = (rmin + rmax) / 2, cx = (cmin + cmax) / 2;
+  const y0 = Math.min(Math.max(0, Math.round((cy - win / 2) / passo) * passo), Math.max(0, H - win));
+  const x0 = Math.min(Math.max(0, Math.round((cx - win / 2) / passo) * passo), Math.max(0, W - win));
+  return { y0, x0, h: Math.min(win, H), w: Math.min(win, W) };
+}
+function recorte(arr, nc, H, W, j) {
+  const out = new Float32Array(nc * j.h * j.w);
+  for (let c = 0; c < nc; c++) for (let r = 0; r < j.h; r++) out.set(arr.subarray(c * H * W + (j.y0 + r) * W + j.x0, c * H * W + (j.y0 + r) * W + j.x0 + j.w), c * j.h * j.w + r * j.w);
   return out;
 }
 
 async function efeito(frac) {
-  const N = 400, NN = N * N, info = DES.info;
-  const xp = Float32Array.from(DES.x);
-  for (const [k, alvo] of Object.entries(info.alvo_normalizado)) {
-    const o = +k * NN;
-    for (let i = 0; i < NN; i++) if (frac[i] > 0) xp[o + i] += frac[i] * (alvo - xp[o + i]);
+  const [H, W] = grade(), info = DES.info, j = janelaDe(frac, H, W), n = j.h * j.w;
+  const xw = recorte(DES.x, 4, H, W, j), fw = recorte(frac, 1, H, W, j);
+  // DP da LST observada na janela (converte a anomalia padronizada em °C)
+  let sd = info.lst_dp_c;
+  if (DES.obs) {
+    const o = recorte(DES.obs, 1, H, W, j); let s = 0, s2 = 0, k = 0;
+    for (const v of o) if (isFinite(v)) { s += v; s2 += v * v; k++; }
+    sd = Math.sqrt(Math.max(0, s2 / k - (s / k) ** 2));
   }
-  const y = await prever(xp);
-  const raw = new Float32Array(NN);
-  for (let i = 0; i < NN; i++) raw[i] = (DES.yBase[i] - y[i]) * info.lst_dp_c;
-  const g5 = gauss(raw, N, 5, 1.0), g15 = gauss(raw, N, 15, 3.0);
-  const cool = new Float32Array(NN);
+  const chave = `${j.y0},${j.x0}`;
+  if (!DES.bases.has(chave)) DES.bases.set(chave, await prever(xw, j.h, j.w));
+  const yb = DES.bases.get(chave);
+  const xp = Float32Array.from(xw);
+  for (const [k, alvo] of Object.entries(info.alvo_normalizado)) {
+    const o = +k * n;
+    for (let i = 0; i < n; i++) if (fw[i] > 0) xp[o + i] += fw[i] * (alvo - xp[o + i]);
+  }
+  const y = await prever(xp, j.h, j.w);
+  const raw = new Float32Array(n);
+  for (let i = 0; i < n; i++) raw[i] = (yb[i] - y[i]) * sd;
+  const g5 = gauss(raw, j.h, j.w, 5, 1.0), g15 = gauss(raw, j.h, j.w, 15, 3.0);
+  const cool = new Float32Array(H * W);
   let sw = 0, sc = 0, n05 = 0, integ = 0;
-  for (let i = 0; i < NN; i++) {
-    const v = 0.7 * g5[i] + 0.3 * g15[i];
-    cool[i] = v;
-    if (frac[i] > 0) { sw += frac[i]; sc += v * frac[i]; }
-    if (DES.valido[i]) { if (v >= 0.5) n05++; if (v > 0) integ += v; }
+  for (let r = 0; r < j.h; r++) for (let c = 0; c < j.w; c++) {
+    const i = r * j.w + c, g = (j.y0 + r) * W + j.x0 + c, v = 0.7 * g5[i] + 0.3 * g15[i];
+    cool[g] = v;
+    if (fw[i] > 0) { sw += fw[i]; sc += v * fw[i]; }
+    if (DES.valido[g]) { if (v >= 0.5) n05++; if (v > 0) integ += v; }
   }
   return { cool, resfriamento_c: sc / Math.max(sw, 1e-9), area_05c_ha: n05 * info.pixel_ha, resfriamento_int: integ * info.pixel_ha };
 }
 
 function overlayResfriamento(cool) {
-  const N = 400, cv = document.createElement("canvas");
-  cv.width = cv.height = N;
-  const ctx = cv.getContext("2d"), img = ctx.createImageData(N, N);
-  for (let i = 0; i < N * N; i++) {
+  const [H, W] = grade(), cv = document.createElement("canvas");
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext("2d"), img = ctx.createImageData(W, H);
+  for (let i = 0; i < H * W; i++) {
     const v = cool[i];
     if (v < 0.1) continue;
     const t = Math.min(1, (v - 0.1) / 1.9);
@@ -174,14 +221,16 @@ async function simularDesenho() {
   $("#d-simular").disabled = true;
   try {
     await carregarModelo(st);
-    const { frac, soma } = fracaoDesenho();
+    const fd = fracaoDesenho(), { frac, soma } = fd;
     if (!soma) { st("Sem espaço plantável na área."); return; }
     st("Simulando o plantio...");
     const t0 = performance.now();
     const r = await efeito(frac);
     const seg = (performance.now() - t0) / 1000;
     overlayResfriamento(r.cool);
-    const ha = soma * DES.info.pixel_ha, arv = Math.max(1, Math.round((ha * 10000) / S.m2));
+    const ha = soma * DES.info.pixel_ha, arv = arvoresDesenho(fd);
+    DES.resultado = { pts: DES.pts.map((p) => [p.lat, p.lng]), area_plantavel_ha: ha, arvores: arv, resfriamento_c: r.resfriamento_c,
+                      area_05c_ha: r.area_05c_ha, resfriamento_int: r.resfriamento_int, ha_por_classe: fd.porClasse.map((v) => v * DES.info.pixel_ha) };
     const custo = custoUnit() ? arv * custoUnit() : null;
     const vr = S.meta.validacao_real?.parques;
     const fracMedia = soma / Math.max(1, frac.reduce((n, f) => n + (f > 0), 0));
@@ -194,6 +243,8 @@ async function simularDesenho() {
       <div class="card"><div class="v">${custo != null ? "R$ " + fmt(custo) : "–"}</div><div class="k">${custo != null ? "custo estimado" : "informe o custo em \"Custos e premissas\""}</div></div>
       <div class="card"><div class="v">${fmt(seg, 1)} s</div><div class="k">tempo no seu navegador (${DES.ep === "webgpu" ? "placa de vídeo" : "processador"})</div></div></div>
       <p class="small">Em verde no mapa: onde a superfície fica ao menos 0,1 °C mais fresca, com as copas formadas.${vr ? ` Nos ${vr.n_parques} parques existentes, o modelo previu em média ${fmt(vr.pred_media_c, 2)} °C de frescor contra ${fmt(vr.obs_media_c, 2)} °C observados: trate o valor como um limite superior.` : ""}</p>`;
+    $("#d-resultado").insertAdjacentHTML("beforeend", `<button class="btn" id="d-gerar">Gerar plano desta área</button>`);
+    $("#d-gerar").onclick = () => gerarPlano("desenho");
     st("Pronto. Desenhe outra área ou ajuste as classes e simule de novo.");
   } catch (e) {
     console.error(e);

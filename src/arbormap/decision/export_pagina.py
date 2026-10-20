@@ -104,6 +104,10 @@ def exportar(derivados, drive_final, out_dir, city="Teresina"):
     ainfo = json.loads(ainfo_p.read_text(encoding="utf-8")) if ainfo_p.exists() else {}
     vreal_p = D / f"{p}_validacao_real.json"
     vreal = json.loads(vreal_p.read_text(encoding="utf-8")) if vreal_p.exists() else None
+    vinmet_p = D / f"{p}_validacao_inmet.json"
+    vinmet = json.loads(vinmet_p.read_text(encoding="utf-8")) if vinmet_p.exists() else None
+    if (D / "especies.json").exists():
+        shutil.copy(D / "especies.json", out / "especies.json")
     m = {
         "cidade": city,
         "bounds_leaflet": [[s, w], [n, e]],
@@ -126,10 +130,13 @@ def exportar(derivados, drive_final, out_dir, city="Teresina"):
         "bairros": binfo,
         "areas": ainfo,
         "validacao_real": vreal,
+        "validacao_inmet": vinmet,
         "custos_referencia": CUSTOS_REFERENCIA,
         "premissas": PREMISSAS,
         "fontes": [
-            "Landsat 8/9 (USGS), via Google Earth Engine: LST, NDVI, NDBI, NDWI; SRTM: DEM",
+            "Landsat 8/9 Collection 2 Nível 2 (USGS): LST, NDVI, NDBI, NDWI. Treino do modelo com dados via Google Earth Engine (DEM SRTM); "
+            "mapa de Teresina ampliado com os mesmos produtos via Microsoft Planetary Computer (DEM NASADEM); na área em comum, "
+            "LST observada com correlação de 0,989 e NDVI com 0,957 entre as duas fontes",
             "Modelo: UrbanHeatNet (ARBORMAP v1.0.0), validação cruzada por cidade",
             "IBGE, Censo 2022: bairros, setores e demografia",
             "Overture Maps (Google Open Buildings, OpenStreetMap, Microsoft): contornos de prédios",

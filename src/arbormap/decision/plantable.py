@@ -72,23 +72,55 @@ def _buffer_m(gdf, dist):
     return gdf.to_crs(UTM).buffer(dist).to_crs(4326)
 
 
-def plantable_fractions(bounds, shape_hw, buildings, vias, verdes, agua):
+def plantable_fractions_faixas(bounds, shape_hw, buildings, vias, verdes, agua, linhas=96, log=print):
+    """Igual a plantable_fractions, por faixas horizontais de `linhas` pixels (para grades grandes,
+    sem estourar a memória). Os buffers das vias e da água são calculados uma vez só."""
+    import geopandas as gpd
+    h, w = shape_hw
+    W0, S0, E0, N0 = bounds
+    dy = (N0 - S0) / h
+    larg = vias["highway"].map(LARGURA_PISTA_M).fillna(6).to_numpy()
+    pistas = gpd.GeoDataFrame(geometry=vias.to_crs(UTM).buffer(larg / 2, cap_style=2).to_crs(4326), crs=4326)
+    com_calc = vias[vias["highway"].isin(VIAS_COM_CALCADA)]
+    larg_c = com_calc["highway"].map(LARGURA_PISTA_M).to_numpy()
+    faixas = gpd.GeoDataFrame(geometry=com_calc.to_crs(UTM).buffer(larg_c / 2 + FAIXA_CALCADA_M, cap_style=2).to_crs(4326), crs=4326)
+    agua_poly = agua[agua.geometry.geom_type == "Polygon"].geometry
+    agua_lin = agua[agua.geometry.geom_type == "LineString"]
+    rios = _buffer_m(agua_lin, 10) if len(agua_lin) else gpd.GeoSeries([], crs=4326)
+    aguas = gpd.GeoDataFrame(geometry=list(agua_poly) + list(rios), crs=4326)
+    out = {k: np.zeros((h, w), np.float32) for k in ("livre", "praca", "calcada", "outros", "construido", "pista")}
+    for r0 in range(0, h, linhas):
+        r1 = min(h, r0 + linhas)
+        b = (W0, N0 - r1 * dy, E0, N0 - r0 * dy)
+        sub = lambda g: g.cx[b[0]:b[2], b[1]:b[3]]
+        fr = plantable_fractions(b, (r1 - r0, w), sub(buildings), None, sub(verdes), None,
+                                 _pre={"pista": sub(pistas).geometry, "faixa": sub(faixas).geometry, "agua": sub(aguas).geometry})
+        for k in out:
+            out[k][r0:r1] = fr[k]
+        log(f"   linhas {r0}-{r1} de {h}")
+    return out
+
+
+def plantable_fractions(bounds, shape_hw, buildings, vias, verdes, agua, _pre=None):
     """Frações (0–1) por pixel de 30 m: livre total e por classe; também a fração construída."""
     h, w = shape_hw
     H, W = h * FATOR, w * FATOR
     tr = from_bounds(*bounds, W, H)
     burn = lambda geoms: features.rasterize(((g, 1) for g in geoms if g is not None and not g.is_empty),
                                             out_shape=(H, W), transform=tr, fill=0, dtype="uint8").astype(bool)
-    larg = vias["highway"].map(LARGURA_PISTA_M).fillna(6).to_numpy()
-    pista = burn(vias.to_crs(UTM).buffer(larg / 2, cap_style=2).to_crs(4326))
-    com_calc = vias[vias["highway"].isin(VIAS_COM_CALCADA)]
-    larg_c = com_calc["highway"].map(LARGURA_PISTA_M).to_numpy()
-    faixa = burn(com_calc.to_crs(UTM).buffer(larg_c / 2 + FAIXA_CALCADA_M, cap_style=2).to_crs(4326))
+    if _pre is not None:
+        pista, faixa, agua_m = burn(_pre["pista"]), burn(_pre["faixa"]), burn(_pre["agua"])
+    else:
+        larg = vias["highway"].map(LARGURA_PISTA_M).fillna(6).to_numpy()
+        pista = burn(vias.to_crs(UTM).buffer(larg / 2, cap_style=2).to_crs(4326))
+        com_calc = vias[vias["highway"].isin(VIAS_COM_CALCADA)]
+        larg_c = com_calc["highway"].map(LARGURA_PISTA_M).to_numpy()
+        faixa = burn(com_calc.to_crs(UTM).buffer(larg_c / 2 + FAIXA_CALCADA_M, cap_style=2).to_crs(4326))
+        agua_poly = agua[agua.geometry.geom_type == "Polygon"].geometry
+        agua_lin = agua[agua.geometry.geom_type == "LineString"]
+        rios = _buffer_m(agua_lin, 10) if len(agua_lin) else []
+        agua_m = burn(list(agua_poly) + list(rios))
     predio = burn(buildings.geometry)
-    agua_poly = agua[agua.geometry.geom_type == "Polygon"].geometry
-    agua_lin = agua[agua.geometry.geom_type == "LineString"]
-    rios = _buffer_m(agua_lin, 10) if len(agua_lin) else []
-    agua_m = burn(list(agua_poly) + list(rios))
     verde = burn(verdes.geometry)
 
     ocupado = predio | pista | agua_m

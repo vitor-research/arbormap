@@ -26,6 +26,8 @@ COBERTURA_MIN = 0.3   # abaixo disso, o bairro aparece sem métricas de calor
 
 
 def grid_bounds(meta, city):
+    if meta.get("bounds"):          # grade com georreferenciamento exato (landsat_pc)
+        return tuple(meta["bounds"])
     full = approx_bounds(*CIDADES_LONLAT[city])
     return crop_bounds(full, meta["shape_original"], meta["recorte_y0_x0"], meta["recorte_h_w"])
 
