@@ -134,6 +134,20 @@ function montarPlano() {
   }
   return { filtradas, plano };
 }
+/* Faixa de resfriamento de um conjunto de áreas (a mesma conta nos modos Gestor e Cidadão).
+   Teto: o resfriamento que o modelo prevê no local que mais se beneficia.
+   Piso: o teto corrigido pelo que o satélite mediu nos parques que já existem (medido ÷ previsto).
+   No ar: relação superfície → ar medida na estação do INMET na estação seca (estimativa grosseira). */
+function faixa(areas) {
+  if (!areas.length) return null;
+  const pq = S.meta.validacao_real?.parques, inm = S.meta.validacao_inmet;
+  const correcao = pq ? Math.min(1, pq.obs_media_c / pq.pred_media_c) : 1;
+  const teto = Math.max(...areas.map((f) => f.properties.resfriamento_c));
+  const ar = inm?.seca?.inclinacao_ar_por_grau_lst;
+  return { piso: teto * correcao, teto, correcao, arPiso: ar ? teto * correcao * ar : null, arTeto: ar ? teto * ar : null };
+}
+const textoFaixa = (fx) => `${fmt(fx.piso, 1)} a ${fmt(fx.teto, 1)} °C`;
+
 function resumoPlano(plano) {
   const razao = plano.length > 1 ? Math.min(S.meta.areas?.aditividade?.razao_conjunto_soma ?? 1, 1) : 1;
   let arv = 0, ha = 0, a05 = 0, wsum = 0, dsum = 0, perto = 0;
@@ -325,16 +339,18 @@ function atualizarTudo(reescreverValor = true) {
   layerAreas.addData({ type: "FeatureCollection", features: S.areas.filter((f) => visiveis.has(f.properties.id)) });
   if (S.modo === "cidadao") layerAreas.setStyle(() => ({ color: "#1d8a45", weight: 1, fillColor: "#1d8a45", fillOpacity: 0.25 }));
 
-  const r = resumoPlano(plano);
+  const r = resumoPlano(plano), fx = faixa(plano);
   $("#cards").innerHTML = [
     ["hl", fmt(r.arv), "árvores em " + fmt(r.n) + " áreas"],
     ["", fmt(r.ha, 1) + " ha", "área plantada"],
-    ["hl", fmt(r.dt, 2) + " °C", "resfriamento médio da superfície no local plantado"],
+    ["hl", fx ? textoFaixa(fx) : "–", fx ? `a menos na superfície nos pontos que mais se beneficiam (média das áreas: ${fmt(r.dt, 2)} °C)` : "resfriamento da superfície"],
     ["", fmt(r.a05, 0) + " ha", "ficam ao menos 0,5 °C mais frescos"],
     ["", fmt(r.nBairros), "bairros atendidos"],
     ["", fmt(r.perto), "áreas a até 300 m de escola, creche ou unidade de saúde"],
   ].map(([c, v, k]) => `<div class="card ${c}"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
-  $("#resumo-nota").innerHTML = "Efeito com as copas adultas, na temperatura da superfície; no ar, o frescor é menor (ver Confiabilidade). Os valores são um limite superior.";
+  $("#resumo-nota").innerHTML = fx
+    ? `Efeito com as copas adultas, na temperatura da superfície. O maior valor da faixa é o que o modelo prevê para a área que mais refresca; o menor aplica a correção medida nos parques que já existem em Teresina (frescor real de ${fmt(fx.correcao * 100)}% do previsto). No ar que se respira, o efeito é menor: cerca de ${fmt(fx.arPiso, 2)} a ${fmt(fx.arTeto, 2)} °C.`
+    : "Efeito com as copas adultas, na temperatura da superfície.";
 
   const tb = $("#tab-areas tbody");
   tb.innerHTML = plano.slice().sort((a, b) => b.properties.resfriamento_c - a.properties.resfriamento_c).map((f) => {
@@ -408,30 +424,22 @@ function fichaBairro(cd) {
       <div class="card"><div class="v">${fmt(p.populacao)}</div><div class="k">moradores (Censo 2022)</div></div>
       <div class="card"><div class="v">${fmt(p.vulneraveis)}</div><div class="k">crianças de 0 a 4 anos e pessoas com 60+ (${fmt(p.vulneraveis_pct)}%)</div></div>
     </div>
-    <p class="small">${areas.length ? `${areas.length} praças e calçadas no bairro onde arborizar refresca.` : "Nenhuma praça ou calçada candidata identificada no bairro."}</p>
+    <p class="small">${areas.length ? `${areas.length} praças e calçadas no bairro onde arborizar refresca: <b>${textoFaixa(faixa(areas))}</b> a menos na superfície nos pontos que mais se beneficiam, se todas forem arborizadas.` : "Nenhuma praça ou calçada candidata identificada no bairro."}</p>
     ${areas.length ? `<button class="btn" id="btn-planejar-b">Planejar neste bairro</button>` : ""}</div>`;
   const b = $("#btn-planejar-b");
   if (b) b.onclick = () => { S.bairro = p.bairro; $("#f-bairro").value = p.bairro; abrirAba("planejar"); atualizarTudo(); };
 }
 
 /* ---------------- cidadão ---------------- */
-/* Faixa de resfriamento se o bairro receber árvores em todas as praças e calçadas indicadas.
-   Teto: o resfriamento que o modelo prevê no local que mais se beneficia.
-   Piso: o teto corrigido pelo que o satélite mediu nos parques que já existem
-   (frescor medido ÷ previsto pelo modelo), a correção conservadora calibrada no mundo real.
-   No ar: relação superfície → ar medida na estação do INMET na estação seca (estimativa grosseira). */
+/* Faixa de resfriamento se o bairro receber árvores em todas as praças e calçadas indicadas
+   (mesma conta de faixa(), usada também no modo Gestor). */
 function faixaBairro(nome) {
   const areas = S.areas.filter((f) => f.properties.bairro === nome && f.properties.resfriamento_c >= EFEITO_MIN);
   if (!areas.length) return null;
-  const pq = S.meta.validacao_real?.parques, inm = S.meta.validacao_inmet;
-  const correcao = pq ? Math.min(1, pq.obs_media_c / pq.pred_media_c) : 1;
-  const teto = Math.max(...areas.map((f) => f.properties.resfriamento_c));
   const razao = areas.length > 1 ? Math.min(S.meta.areas?.aditividade?.razao_conjunto_soma ?? 1, 1) : 1;
   const ha05 = areas.reduce((s, f) => s + f.properties.area_05c_ha, 0) * razao;
-  const ar = inm?.seca?.inclinacao_ar_por_grau_lst;
   const melhores = areas.slice().sort((a, b) => b.properties.resfriamento_c - a.properties.resfriamento_c).slice(0, 3);
-  return { n: areas.length, arvores: areas.reduce((s, f) => s + arvoresDe(f.properties), 0), piso: teto * correcao, teto, correcao,
-           ha05, arPiso: ar ? teto * correcao * ar : null, arTeto: ar ? teto * ar : null, melhores,
+  return { ...faixa(areas), n: areas.length, arvores: areas.reduce((s, f) => s + arvoresDe(f.properties), 0), ha05, melhores,
            pracas: areas.filter((f) => f.properties.tipo === "praca").length, calcadas: areas.filter((f) => f.properties.tipo === "calcada").length };
 }
 function linkPlanoBairro(nome, fx) {

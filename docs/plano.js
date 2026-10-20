@@ -50,6 +50,11 @@ function montar(areas) {
   let arv = 0, ha = 0, a05 = 0, dt = 0;
   areas.forEach((f) => { const p = f.properties; arv += p.arvores; ha += p.area_plantavel_ha; a05 += p.area_05c_ha; dt += p.resfriamento_c * p.area_plantavel_ha; });
   const r = areas.length > 1 ? R : 1;
+  // faixa: teto = área que mais refresca; piso = teto × (frescor medido ÷ previsto nos parques existentes)
+  const pq = M.validacao_real?.parques, inm = M.validacao_inmet;
+  const correcao = pq ? Math.min(1, pq.obs_media_c / pq.pred_media_c) : 1;
+  const teto = Math.max(...areas.map((f) => f.properties.resfriamento_c)), arK = inm?.seca?.inclinacao_ar_por_grau_lst ?? NaN;
+  const fx = { teto, piso: teto * correcao, correcao, arPiso: teto * correcao * arK, arTeto: teto * arK };
   const bairros = bairrosAtendidos(areas), equipPerto = equipamentosPerto(areas, 300);
   const vuln = bairros.reduce((s, b) => s + (b.vulneraveis || 0), 0), mor = bairros.reduce((s, b) => s + (b.populacao || 0), 0);
   const pr = P.params;
@@ -62,14 +67,14 @@ function montar(areas) {
     <div class="cards">
       ${card("hl", fmt(arv), "árvores a plantar")}
       ${card("", fmt(ha, 1) + " ha", "área plantada")}
-      ${card("hl", fmt(ha ? dt / ha : 0, 2) + " °C", "resfriamento médio da superfície no local, com as copas adultas")}
+      ${card("hl", `${fmt(fx.piso, 1)} a ${fmt(fx.teto, 1)} °C`, `a menos na superfície nos pontos que mais se beneficiam, com as copas adultas (média das áreas: ${fmt(ha ? dt / ha : 0, 2)} °C)`)}
       ${card("", fmt(a05 * r, 0) + " ha", "ficam ao menos 0,5 °C mais frescos")}
       ${card("", fmt(bairros.length), "bairros atendidos")}
       ${card("", fmt(equipPerto.length), "escolas, creches e unidades de saúde a até 300 m")}
       ${card("", fmt(mor), "moradores nos bairros atendidos (Censo 2022)")}
       ${card("", fmt(vuln), "crianças de 0 a 4 anos e pessoas com 60 anos ou mais nesses bairros")}
     </div>
-    <p class="small">Temperatura da superfície medida por satélite (estação seca); no ar, o frescor é menor. Os valores são um limite superior: nos parques que já existem, o modelo previu mais frescor do que o satélite mede.</p>
+    <p class="small">Temperatura da superfície medida por satélite (estação seca). O maior valor da faixa é o que o modelo prevê para a área que mais refresca; o menor aplica a correção medida nos parques que já existem em Teresina (frescor real de ${fmt(fx.correcao * 100)}% do previsto). No ar que se respira, o efeito é menor: cerca de ${fmt(fx.arPiso, 2)} a ${fmt(fx.arTeto, 2)} °C.</p>
   </section>
 
   <section>
