@@ -130,6 +130,7 @@ def export_city(res, out_dir, prefix="teresina", full_bounds=None, legend_percen
     valid = res["valid"][:hh, :ww]
     pred = np.where(valid, res["lst_base"][:hh, :ww], np.nan)
     obs = np.where(valid, res["lst_obs"][:hh, :ww], np.nan)
+    obs[obs <= 1.0] = np.nan   # lacunas de nuvem gravadas como 0 no download
     inviavel = res["inviavel"][:hh, :ww]
 
     vals = np.concatenate([pred[valid], obs[valid & np.isfinite(obs)]])

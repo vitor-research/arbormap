@@ -104,6 +104,8 @@ def load_scene(data_dir, city, valid_files_set, stats, pair_index=-1):
     raw[CH_NDWI] = np.clip(raw[CH_NDWI], -1, 1)
     lst_obs = np.full((CROP, CROP), np.nan, dtype=np.float32)
     lst_obs[:hh, :ww] = np.clip(tgt[CH_LST, y0:y0 + hh, x0:x0 + ww], LST_CLIP_MIN, LST_CLIP_MAX)
+    # Pixels com LST <= 1 °C são lacunas de nuvem gravadas como 0 no download, não temperatura
+    lst_obs[lst_obs <= 1.0] = np.nan
 
     valid_np = valid[0].numpy().astype(bool)
     macro = float(np.nanmean(lst_obs[valid_np]))
@@ -112,6 +114,29 @@ def load_scene(data_dir, city, valid_files_set, stats, pair_index=-1):
             "recorte_y0_x0": [int(y0), int(x0)], "recorte_h_w": [int(hh), int(ww)],
             "lst_media_cena_c": macro, "lst_dp_cena_c": float(std_anom)}
     return x.unsqueeze(0), tgt_z.unsqueeze(0), valid.unsqueeze(0), raw, lst_obs, float(std_anom), macro, meta
+
+
+def select_clear_dry_pair(data_dir, city, valid_files_set, dry_months=(6, 7, 8, 9, 10)):
+    """Índice do par (base -> alvo) mais recente da estação seca com céu limpo.
+
+    Entre os pares cujo mês-alvo está na estação seca, mantêm-se os de menor fração de
+    pixels de LST abaixo de 15 °C (até 0,1 ponto percentual acima do mínimo) e com desvio-
+    padrão da LST até a mediana desses pares; escolhe-se o mais recente. Devolve também a
+    tabela usada, para registro.
+    """
+    ds = UrbanHeatDataset(data_dir, allowed_cities=[city], valid_files_set=valid_files_set, normalize=False)
+    rows = []
+    for i, (_, tgt_file) in enumerate(ds.samples):
+        month = int(Path(tgt_file).stem.split("_")[-1])
+        lst = ensure_channels_first(np.load(tgt_file).astype(np.float32))[CH_LST]
+        rows.append({"indice": i, "alvo": Path(tgt_file).name, "mes": month,
+                     "fracao_abaixo_15c": float((lst < 15).mean()), "dp_c": float(lst.std())})
+    dry = [r for r in rows if r["mes"] in dry_months] or rows
+    fmin = min(r["fracao_abaixo_15c"] for r in dry)
+    clear = [r for r in dry if r["fracao_abaixo_15c"] <= fmin + 0.001]
+    med = float(np.median([r["dp_c"] for r in clear]))
+    chosen = max((r for r in clear if r["dp_c"] <= med), key=lambda r: r["indice"])
+    return chosen["indice"], rows
 
 
 def predict_celsius(model, x, std_ref, mean_ref):
